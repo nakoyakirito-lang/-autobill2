@@ -3163,6 +3163,10 @@
 
       const dateMap = {};
       cachedBills.forEach(([tracking, item]) => {
+        if (sendModalCarrier !== 'all') {
+          const carrier = item.carrier || (tracking.startsWith('HAL') || tracking.startsWith('HA') ? 'HAL Express' : 'Anousith Express');
+          if (!carrier.toLowerCase().includes(sendModalCarrier.toLowerCase())) return;
+        }
         const dStr = normalizeDateStr(item.dateDeposited, item.sent_at);
         if (!dStr) return;
         dateMap[dStr] = (dateMap[dStr] || 0) + 1;
@@ -3228,6 +3232,7 @@
 
     function selectSendCarrier(carrier) {
       sendModalCarrier = carrier;
+      populateAvailableDepositDates();
       ['all', 'Anousith Express', 'HAL Express'].forEach(c => {
         const id = c === 'all' ? 'btn-sc-all' : c === 'Anousith Express' ? 'btn-sc-anousith' : 'btn-sc-hal';
         const btn = document.getElementById(id);

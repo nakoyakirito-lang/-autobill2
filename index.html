@@ -1483,7 +1483,20 @@
     </div>
   </div>
 
-  <script>
+    <script>
+    // --- Supabase Cloud Client initialization ---
+    const SUPABASE_URL = 'https://pgoovfpnnegaucbjoyfu.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBnb292ZnBubmVnYXVjYmpveWZ1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg1ODI5OTQsImV4cCI6MjEwNDE1ODk5NH0.Ky2t9N-Ku0VjzuI6_W-6wXd2LkuSkzGQM1KCOMhasQ0';
+    let supaClient = null;
+    try {
+      if (window.supabase && typeof window.supabase.createClient === 'function') {
+        supaClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        console.log('✅ Supabase Cloud client initialized successfully');
+      }
+    } catch (err) {
+      console.warn('⚠️ Could not initialize Supabase client:', err);
+    }
+
     let pollInterval = null;
     let currentModalCarrier = 'anousith'; // 'anousith' or 'hal'
 

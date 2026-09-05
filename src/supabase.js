@@ -19,17 +19,50 @@ function isSupabaseConfigured() {
   return Boolean(supabase);
 }
 
+function sanitizeMetadata(item) {
+  if (!item || typeof item !== 'object') return {};
+  const cleaned = {};
+  for (const [k, v] of Object.entries(item)) {
+    if (typeof v === 'string' && (v.startsWith('data:image') || v.length > 5000)) {
+      continue;
+    }
+    cleaned[k] = v;
+  }
+  return cleaned;
+}
+
+function getSafeBillUrl(tracking, item) {
+  const url = String(item?.billUrl || '');
+  if (url.startsWith('http://') || url.startsWith('https://')) {
+    if (url.length < 500 && !url.includes('{') && !url.includes('[') && !url.includes('data:image')) {
+      return url;
+    }
+  }
+  const cleanTrack = String(tracking).trim();
+  if (item?.carrier?.includes('HAL') || cleanTrack.startsWith('HAL') || cleanTrack.startsWith('HA') || cleanTrack.startsWith('VTE')) {
+    return `https://halexpress.la/parcel?tracking=${cleanTrack}`;
+  }
+  return `https://app.anousith.express/landing/search_tracking/bill_share?tacking_number=${cleanTrack}`;
+}
+
 // Map local object format to Supabase row format
 function mapBillToRow(tracking, item) {
+  const cleanBillUrl = getSafeBillUrl(tracking, item);
+
   return {
-    tracking_number: tracking,
+    tracking_number: String(tracking).trim(),
     carrier: item.carrier || (tracking.startsWith('HAL') || tracking.startsWith('HA') ? 'HAL Express' : 'Anousith Express'),
     recipient_name: item.recipientName || '',
     recipient_phone: item.recipientPhone || '',
     destination_branch: item.destinationBranch || '',
+    origin_branch: item.originBranch || '',
+    item_name: item.itemName || '',
     cod_expected: item.codExpected || '0 KIP',
     cod_collected: item.codCollected || '0 KIP',
+    cod_expected_num: Number(item.codExpectedNum) || 0,
+    cod_collected_num: Number(item.codCollectedNum) || 0,
     shipping_status: item.shippingStatus || 'ກຳລັງຂົນສົ່ງ',
+    settlement_status: item.settlementStatus || '-',
     date_deposited: item.dateDeposited || '',
     sent_to_whatsapp: Boolean(item.sent_to_whatsapp),
     sent_at: item.sent_at || null,
@@ -40,8 +73,8 @@ function mapBillToRow(tracking, item) {
     last_reminded_at: item.last_reminded_at || null,
     reminder_count: item.reminder_count || 0,
     reminder_history: item.reminder_history || [],
-    bill_url: item.billUrl || null,
-    metadata: item,
+    bill_url: cleanBillUrl,
+    metadata: sanitizeMetadata(item),
     updated_at: new Date().toISOString()
   };
 }
@@ -72,21 +105,30 @@ function mapRowToBill(row) {
   };
 }
 
-// Sync all local bills to Supabase
+// Sync all local bills to Supabase in chunks
 async function syncLocalBillsToSupabase(localSentBills) {
   if (!supabase || !localSentBills) return;
   const rows = Object.entries(localSentBills).map(([tracking, item]) => mapBillToRow(tracking, item));
   if (rows.length === 0) return;
 
-  const { data, error } = await supabase
-    .from('bills')
-    .upsert(rows, { onConflict: 'tracking_number' });
+  const CHUNK_SIZE = 40;
+  let totalSynced = 0;
 
-  if (error) {
-    console.error('❌ Error syncing bills to Supabase:', error.message);
-  } else {
-    console.log(`✅ Successfully synced ${rows.length} bills to Supabase!`);
+  for (let i = 0; i < rows.length; i += CHUNK_SIZE) {
+    const chunk = rows.slice(i, i + CHUNK_SIZE);
+    const { data, error } = await supabase
+      .from('bills')
+      .upsert(chunk, { onConflict: 'tracking_number' });
+
+    if (error) {
+      console.error(`❌ Error syncing batch ${i}-${i + chunk.length} to Supabase:`, error.message);
+    } else {
+      totalSynced += chunk.length;
+    }
   }
+
+  console.log(`✅ Successfully synced ${totalSynced} / ${rows.length} bills to Supabase!`);
+  return totalSynced;
 }
 
 // Fetch all bills from Supabase

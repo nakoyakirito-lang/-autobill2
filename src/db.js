@@ -40,6 +40,17 @@ function isBillSent(trackingNumber) {
   return Boolean(db.sent_bills && db.sent_bills[trackingNumber]);
 }
 
+function asyncSyncBillToSupabase(tracking, billData) {
+  try {
+    const { supabase, isSupabaseConfigured, mapBillToRow } = require('./supabase');
+    if (!isSupabaseConfigured() || !supabase) return;
+    const row = mapBillToRow(tracking, billData);
+    supabase.from('bills').upsert([row], { onConflict: 'tracking_number' }).then(() => {}).catch(err => {
+      console.error(`Supabase sync error for #${tracking}:`, err.message);
+    });
+  } catch (e) {}
+}
+
 function upsertBill(trackingNumber, metadata = {}) {
   if (!trackingNumber) return;
   const db = getDatabase();
@@ -56,6 +67,7 @@ function upsertBill(trackingNumber, metadata = {}) {
     updated_at: new Date().toISOString()
   };
   saveDatabase(db);
+  asyncSyncBillToSupabase(trackingNumber, db.sent_bills[trackingNumber]);
   return db.sent_bills[trackingNumber];
 }
 
@@ -73,6 +85,7 @@ function markBillSent(trackingNumber, metadata = {}) {
     updated_at: new Date().toISOString()
   };
   saveDatabase(db);
+  asyncSyncBillToSupabase(trackingNumber, db.sent_bills[trackingNumber]);
   return db.sent_bills[trackingNumber];
 }
 

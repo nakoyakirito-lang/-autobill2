@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: autobillsavage
+    runtime: node
+    region: singapore
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: ANOUSITH_USERNAME
+        value: "02028372583"
+      - key: ANOUSITH_PASSWORD
+        value: "Jo112233"
+      - key: ANOUSITH_BASE_URL
+        value: "https://app.anousith.express"
+      - key: POLL_INTERVAL_SECONDS
+        value: "60"
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false

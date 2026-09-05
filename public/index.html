@@ -1,0 +1,3106 @@
+<!DOCTYPE html>
+<html lang="lo">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Auto bill From anousone - WhatsApp Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Lao:wght@400;600;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', 'Noto Sans Lao', sans-serif; }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    .pb-safe { padding-bottom: calc(5.5rem + env(safe-area-inset-bottom, 0px)); }
+    /* Touch friendly tap highlights */
+    button, a, input, select { -webkit-tap-highlight-color: transparent; }
+  </style>
+</head>
+<body class="bg-slate-100 text-slate-800 min-h-screen pb-safe md:pb-8">
+  <!-- Top Navbar -->
+  <header class="bg-gradient-to-r from-red-600 via-red-600 to-red-700 text-white shadow-md sticky top-0 z-30">
+    <div class="max-w-6xl mx-auto px-3 sm:px-4 py-2.5 sm:py-4 flex flex-wrap items-center justify-between gap-2.5 sm:gap-4">
+      <div class="flex items-center space-x-2.5 sm:space-x-3">
+        <div class="w-8 h-8 sm:w-10 sm:h-10 bg-white rounded-xl flex items-center justify-center text-red-600 font-black text-lg sm:text-xl shadow-xs">
+          A
+        </div>
+        <div>
+          <h1 class="text-base sm:text-xl font-bold tracking-tight leading-tight">Auto bill From anousone</h1>
+          <p class="text-[10px] sm:text-xs text-red-100 hidden sm:block">ລະບົບສົ່ງໃບບິນ ແລະ ແຈ້ງເຕືອນອັດຕະໂນມັດເຂົ້າ WhatsApp</p>
+        </div>
+      </div>
+      
+      <div class="flex items-center gap-1.5 sm:gap-2.5 flex-wrap">
+        <!-- Anousith Account Widget -->
+        <button onclick="openLoginModal('anousith')" class="flex items-center gap-1.5 bg-white/10 hover:bg-white/20 active:scale-95 border border-white/20 px-2 sm:px-3 py-1 sm:py-1.5 rounded-xl text-xs font-semibold text-white transition shadow-2xs cursor-pointer" title="ຄລິກເພື່ອເຂົ້າສູ່ລະບົບ ຫຼື ສະຫຼັບບັນຊີ Anousith">
+          <div id="anousith-avatar" class="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-red-900 flex items-center justify-center text-white text-[9px] sm:text-[10px] font-bold">
+            <i class="fas fa-store"></i>
+          </div>
+          <div class="text-left">
+            <div id="anousith-user-name" class="font-bold leading-tight truncate max-w-[80px] sm:max-w-[110px] text-[11px] sm:text-xs">Savage shop</div>
+            <div id="anousith-user-phone" class="text-[9px] sm:text-[10px] text-red-200 leading-tight hidden xs:block">02028372583</div>
+          </div>
+          <i class="fas fa-chevron-down text-[8px] sm:text-[9px] text-red-200 ml-0.5"></i>
+        </button>
+
+        <!-- HAL Express Account Widget -->
+        <button onclick="openLoginModal('hal')" class="flex items-center gap-1.5 bg-amber-500/20 hover:bg-amber-500/30 active:scale-95 border border-amber-300/30 px-2 sm:px-3 py-1 sm:py-1.5 rounded-xl text-xs font-semibold text-white transition shadow-2xs cursor-pointer" title="ຄລິກເພື່ອເຂົ້າສູ່ລະບົບ ຫຼື ສະຫຼັບບັນຊີ HAL Express">
+          <div id="hal-avatar" class="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-amber-600 flex items-center justify-center text-white text-[9px] sm:text-[10px] font-bold">
+            <i class="fas fa-bolt"></i>
+          </div>
+          <div class="text-left">
+            <div id="hal-user-name" class="font-bold leading-tight truncate max-w-[80px] sm:max-w-[110px] text-[11px] sm:text-xs">ເຂົ້າສູ່ລະບົບ HAL</div>
+            <div id="hal-user-phone" class="text-[9px] sm:text-[10px] text-amber-200 leading-tight hidden xs:block">HAL Express</div>
+          </div>
+          <i class="fas fa-chevron-down text-[8px] sm:text-[9px] text-amber-200 ml-0.5"></i>
+        </button>
+
+        <!-- WhatsApp Connection Status -->
+        <div id="connection-status-pill" class="flex items-center gap-1.5 bg-red-800/60 px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-full text-[11px] sm:text-xs font-semibold">
+          <span class="w-2 sm:w-2.5 h-2 sm:h-2.5 rounded-full bg-yellow-400 animate-pulse" id="status-dot"></span>
+          <span id="status-text" class="hidden sm:inline">ກຳລັງໂຫຼດລະບົບ...</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-3 sm:px-4 py-4 sm:py-8 space-y-4 sm:space-y-8">
+    
+    <!-- Top Grid: QR Code & Manual Send -->
+    <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+      
+      <!-- WhatsApp Connection & QR Code Card -->
+      <div class="md:col-span-5 bg-white rounded-2xl shadow-sm border border-slate-200/80 p-6 flex flex-col justify-between">
+        <div>
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-base font-bold flex items-center gap-2 text-slate-900">
+              <i class="fab fa-whatsapp text-emerald-500 text-xl"></i>
+              ສະຖານະ WhatsApp
+            </h2>
+            <button onclick="checkStatus()" class="text-xs text-slate-500 hover:text-slate-800 flex items-center gap-1 font-medium transition">
+              <i class="fas fa-rotate text-[10px]"></i> Refresh
+            </button>
+          </div>
+
+          <!-- Disconnected / QR State -->
+          <div id="qr-container" class="text-center py-4 space-y-3">
+            <div class="inline-block p-3 bg-white border-2 border-dashed border-slate-300 rounded-2xl shadow-inner relative" id="qr-wrapper">
+              <img id="qr-img" src="" alt="WhatsApp QR Code" class="w-52 h-52 mx-auto rounded-lg hidden" />
+              <div id="qr-loading" class="w-52 h-52 flex flex-col items-center justify-center text-slate-400 gap-2">
+                <i class="fas fa-spinner fa-spin text-2xl text-red-500"></i>
+                <span class="text-xs">ກຳລັງສ້າງ QR Code...</span>
+              </div>
+            </div>
+            <p class="text-xs text-slate-600 leading-relaxed max-w-xs mx-auto">
+              ເປີດ <strong>WhatsApp</strong> ໃນມືຖື > Settings > <strong>Linked Devices</strong> > ສະແກນ QR Code ນີ້
+            </p>
+          </div>
+
+          <!-- Connected State -->
+          <div id="connected-box" class="hidden text-center py-8 space-y-3">
+            <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center text-2xl mx-auto shadow-sm">
+              <i class="fas fa-check"></i>
+            </div>
+            <h3 class="font-bold text-slate-900">WhatsApp ເຊື່ອມຕໍ່ແລ້ວ!</h3>
+            <p class="text-xs text-slate-500 max-w-xs mx-auto">
+              ລະບົບພ້ອມສົ່ງໃບບິນໃຫ້ລູກຄ້າອັດຕະໂນມັດ 24/7
+            </p>
+          </div>
+        </div>
+
+        <div class="pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-xs text-slate-500">
+          <div class="flex items-center gap-2 flex-wrap">
+            <span>Auto Poller: <strong id="poller-status" class="text-emerald-600">ເຮັດວຽກ (ທຸກ 60s)</strong></span>
+            <span id="auto-reminder-badge" onclick="toggleAutoReminder()" title="ກົດເພື່ອເປີດ/ປິດ ລະບົບເຕືອນອັດຕະໂນມັດທຸກ 2 ວັນ" class="cursor-pointer text-[10px] bg-amber-50 text-amber-800 font-semibold px-2 py-0.5 rounded-lg border border-amber-200 hover:bg-amber-100 transition">
+              ⏰ ເຕືອນທຸກ 2 ວັນ: <strong>ເປີດ</strong>
+            </span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span id="last-sync-time" class="text-[10px] text-slate-400 font-mono"></span>
+            <button id="btn-sync-now" onclick="triggerSync()" class="bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 px-3 py-1.5 rounded-xl font-bold transition flex items-center gap-1.5 shadow-2xs hover:scale-105 active:scale-95">
+              <i class="fas fa-sync-alt text-xs" id="sync-icon"></i> <span>Sync ຕອນນີ້</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- CSV / Excel File Upload Card -->
+      <div class="md:col-span-7 bg-white rounded-2xl shadow-sm border border-slate-200/80 p-6 flex flex-col justify-between">
+        <div>
+          <div class="flex items-center justify-between mb-3">
+            <h2 class="text-base font-bold flex items-center gap-2 text-slate-900">
+              <i class="fas fa-file-excel text-emerald-600 text-lg"></i>
+              ນຳເຂົ້າຂໍ້ມູນ Excel / CSV (Anousith & HAL Express)
+            </h2>
+            <div class="flex items-center gap-1 bg-slate-100 p-1 rounded-xl">
+              <button type="button" id="tab-btn-file" onclick="switchImportTab('file')" class="text-xs px-2.5 py-1 rounded-lg font-semibold bg-white text-slate-900 shadow-sm transition">
+                <i class="fas fa-file-upload mr-1"></i> ເລືອກໄຟລ໌
+              </button>
+              <button type="button" id="tab-btn-paste" onclick="switchImportTab('paste')" class="text-xs px-2.5 py-1 rounded-lg font-medium text-slate-600 hover:text-slate-900 transition">
+                <i class="fas fa-paste mr-1"></i> ວາງຂໍ້ຄວາມ (Paste)
+              </button>
+            </div>
+          </div>
+
+          <!-- Tab 1: File Upload & Drag-and-Drop -->
+          <form id="csv-upload-form" onsubmit="uploadCsvFile(event)" class="space-y-3">
+            <div id="drop-zone" class="border-2 border-dashed border-slate-300 hover:border-red-500 rounded-2xl p-6 text-center bg-slate-50/50 hover:bg-red-50/30 transition cursor-pointer"
+                 onclick="document.getElementById('csv-file-input').click()">
+              <input type="file" id="csv-file-input" accept=".csv, .xlsx, .xls" class="hidden" onchange="handleFileSelected(event)" />
+              <div class="space-y-2">
+                <i class="fas fa-cloud-arrow-up text-3xl text-red-500"></i>
+                <p id="file-chosen-text" class="text-xs font-semibold text-slate-700">
+                  ກົດທີ່ນີ້ເພື່ອເລືອກໄຟລ໌ Excel / CSV ຫຼື ລາກໄຟລ໌ມາວາງໃສ່ນີ້
+                </p>
+                <p class="text-[11px] text-slate-400">ຮອງຮັບໄຟລ໌ .xlsx, .xls, .csv ຈາກ Anousith & HAL Express (ຮຸ່ງອາລຸນ)</p>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-3 pt-1">
+              <button type="submit" id="btn-submit-csv"
+                class="flex-1 bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white font-semibold py-2.5 px-4 rounded-xl shadow-sm text-xs flex items-center justify-center gap-2 transition">
+                <i class="fas fa-upload"></i> ນຳເຂົ້າຂໍ້ມູນຈາກໄຟລ໌
+              </button>
+              <button type="button" onclick="sendAllWhatsApp()" id="btn-send-all"
+                class="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-semibold py-2.5 px-4 rounded-xl shadow-sm text-xs flex items-center justify-center gap-2 transition">
+                <i class="fab fa-whatsapp"></i> ສົ່ງ WhatsApp ທັງໝົດ
+              </button>
+            </div>
+          </form>
+
+          <!-- Tab 2: Direct Paste from Excel Clipboard -->
+          <form id="paste-upload-form" onsubmit="uploadPastedData(event)" class="space-y-3 hidden">
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">
+                ກັອບປີ້ຕາຕະລາງຈາກ Excel (Ctrl+C) ແລ້ວມາວາງໃສ່ນີ້ (Ctrl+V):
+              </label>
+              <textarea id="paste-raw-input" rows="5" placeholder="ວາງຂໍ້ມູນຕາຕະລາງ Excel ທີ່ກັອບປີ້ມານີ້..."
+                class="w-full text-xs font-mono p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none"></textarea>
+            </div>
+
+            <div class="flex items-center gap-3 pt-1">
+              <button type="submit" id="btn-submit-paste"
+                class="flex-1 bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white font-semibold py-2.5 px-4 rounded-xl shadow-sm text-xs flex items-center justify-center gap-2 transition">
+                <i class="fas fa-check-circle"></i> ອ່ານ & ນຳເຂົ້າຂໍ້ມູນທີ່ວາງ
+              </button>
+              <button type="button" onclick="sendAllWhatsApp()"
+                class="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-semibold py-2.5 px-4 rounded-xl shadow-sm text-xs flex items-center justify-center gap-2 transition">
+                <i class="fab fa-whatsapp"></i> ສົ່ງ WhatsApp ທັງໝົດ
+              </button>
+            </div>
+          </form>
+
+          <div id="csv-feedback" class="mt-3 text-xs hidden p-3 rounded-xl"></div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- Dashboard KPI Section with Integrated Date Filter Bar -->
+    <div class="space-y-3">
+      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-white p-4 rounded-2xl border border-slate-200/80 shadow-xs">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-xl bg-red-100 text-red-600 flex items-center justify-center text-sm font-bold shadow-2xs">
+            <i class="fas fa-chart-pie"></i>
+          </div>
+          <div>
+            <h2 class="text-sm font-bold text-slate-900 flex items-center gap-2">
+              ສະຫຼຸບສະຖິຕິ & ຍອດ COD (Overview Statistics)
+            </h2>
+            <p class="text-xs text-slate-500">ກັ່ນຕອງເບິ່ງຈຳນວນພັດສະດຸ ແລະ ຍອດເງິນ COD ຕາມວັນທີ</p>
+          </div>
+        </div>
+
+        <!-- Top Date Filter Controls & KPI Collapse Toggle -->
+        <div class="flex flex-wrap items-center gap-2">
+          <div class="flex items-center bg-slate-100 p-1 rounded-xl gap-1 text-xs">
+            <button onclick="setDatePreset('all')" id="top-date-btn-all" class="px-2.5 py-1 rounded-lg font-bold bg-white text-slate-900 shadow-xs transition">
+              ທຸກວັນທີ
+            </button>
+            <button onclick="setDatePreset('today')" id="top-date-btn-today" class="px-2.5 py-1 rounded-lg font-semibold text-slate-600 hover:text-slate-900 transition">
+              ມື້ນີ້
+            </button>
+            <button onclick="setDatePreset('7days')" id="top-date-btn-7days" class="px-2.5 py-1 rounded-lg font-semibold text-slate-600 hover:text-slate-900 transition">
+              7 ມື້
+            </button>
+            <button onclick="setDatePreset('30days')" id="top-date-btn-30days" class="px-2.5 py-1 rounded-lg font-semibold text-slate-600 hover:text-slate-900 transition">
+              30 ມື້
+            </button>
+          </div>
+
+          <div class="flex items-center gap-1.5 text-xs bg-slate-50 border border-slate-200 px-2.5 py-1 rounded-xl">
+            <span class="text-slate-400 text-[11px]">ແຕ່ວັນທີ:</span>
+            <input type="date" id="top-date-from" onchange="applyTopCustomDate()"
+              class="bg-transparent text-xs font-mono outline-none text-slate-700" />
+            <span class="text-slate-400 text-[11px]">ຫາ:</span>
+            <input type="date" id="top-date-to" onchange="applyTopCustomDate()"
+              class="bg-transparent text-xs font-mono outline-none text-slate-700" />
+            <button onclick="clearDateFilter()" title="ລ້າງວັນທີ" class="text-slate-400 hover:text-slate-700 text-[11px] ml-1">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+
+          <!-- KPI Collapse Toggle Button -->
+          <button onclick="toggleKpiCollapse()" id="btn-toggle-kpi" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-2.5 py-1.5 rounded-xl border border-slate-200 transition flex items-center gap-1.5 shadow-2xs">
+            <i class="fas fa-eye-slash text-slate-500" id="kpi-toggle-icon"></i>
+            <span id="kpi-toggle-text">ຊ່ອນສະຖິຕິ</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Summary KPI Cards for Status and COD (Collapsible) -->
+      <div id="kpi-section-body" class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3 transition-all duration-300">
+        <div class="bg-white p-3.5 rounded-2xl border border-slate-200/80 shadow-sm">
+          <div class="text-[11px] font-semibold text-slate-500 mb-1 flex items-center gap-1">
+            <i class="fas fa-boxes text-slate-700"></i> ທັງໝົດ
+          </div>
+          <div id="stat-total" class="text-xl font-bold text-slate-900 font-mono">0</div>
+          <div class="text-[10px] text-slate-400">ລາຍການ</div>
+        </div>
+
+        <div class="bg-blue-50/60 p-3.5 rounded-2xl border border-blue-200/80 shadow-sm">
+          <div class="text-[11px] font-semibold text-blue-700 mb-1 flex items-center gap-1">
+            <i class="fas fa-truck text-blue-600"></i> ກຳລັງຂົນສົ່ງ
+          </div>
+          <div id="stat-transit" class="text-xl font-bold text-blue-800 font-mono">0</div>
+          <div class="text-[10px] text-blue-600/80">ກຳລັງເດີນທາງ</div>
+        </div>
+
+        <div class="bg-amber-50/60 p-3.5 rounded-2xl border border-amber-200/80 shadow-sm">
+          <div class="text-[11px] font-semibold text-amber-700 mb-1 flex items-center gap-1">
+            <i class="fas fa-map-marker-alt text-amber-600"></i> ຮອດປາຍທາງ
+          </div>
+          <div id="stat-destination" class="text-xl font-bold text-amber-800 font-mono">0</div>
+          <div class="text-[10px] text-amber-600/80">ລໍຖ້າລູກຄ້າມາເອົາ</div>
+        </div>
+
+        <div class="bg-emerald-50/60 p-3.5 rounded-2xl border border-emerald-200/80 shadow-sm">
+          <div class="text-[11px] font-semibold text-emerald-700 mb-1 flex items-center gap-1">
+            <i class="fas fa-check-circle text-emerald-600"></i> ຮັບເຄື່ອງແລ້ວ
+          </div>
+          <div id="stat-delivered" class="text-xl font-bold text-emerald-800 font-mono">0</div>
+          <div class="text-[10px] text-emerald-600/80">ສຳເລັດ</div>
+        </div>
+
+        <div class="bg-rose-50/60 p-3.5 rounded-2xl border border-rose-200/80 shadow-sm">
+          <div class="text-[11px] font-semibold text-rose-700 mb-1 flex items-center gap-1">
+            <i class="fas fa-undo-alt text-rose-600"></i> ຕີກັບ
+          </div>
+          <div id="stat-returned" class="text-xl font-bold text-rose-800 font-mono">0</div>
+          <div class="text-[10px] text-rose-600/80">ສົ່ງຄືນຮ້ານ</div>
+        </div>
+
+        <div class="bg-indigo-50/60 p-3.5 rounded-2xl border border-indigo-200/80 shadow-sm">
+          <div class="text-[11px] font-semibold text-indigo-700 mb-1 flex items-center gap-1">
+            <i class="fas fa-money-bill-wave text-indigo-600"></i> COD ຄວນເກັບ
+          </div>
+          <div id="stat-cod-expected" class="text-xs font-bold text-indigo-900 font-mono mt-1">0 KIP</div>
+          <div class="text-[10px] text-indigo-600/80">ຍອດລວມທັງໝົດ</div>
+        </div>
+
+        <div class="bg-teal-50/60 p-3.5 rounded-2xl border border-teal-200/80 shadow-sm">
+          <div class="text-[11px] font-semibold text-teal-700 mb-1 flex items-center gap-1">
+            <i class="fas fa-hand-holding-usd text-teal-600"></i> COD ເກັບໄດ້
+          </div>
+          <div id="stat-cod-collected" class="text-xs font-bold text-teal-900 font-mono mt-1">0 KIP</div>
+          <div class="text-[10px] text-teal-600/80">ເຂົ້າບັນຊີແລ້ວ</div>
+        </div>
+
+        <div class="bg-orange-50/60 p-3.5 rounded-2xl border border-orange-200/80 shadow-sm">
+          <div class="text-[11px] font-semibold text-orange-700 mb-1 flex items-center gap-1">
+            <i class="fas fa-hourglass-half text-orange-600"></i> COD ຄ້າງເກັບ
+          </div>
+          <div id="stat-cod-pending" class="text-xs font-bold text-orange-900 font-mono mt-1">0 KIP</div>
+          <div class="text-[10px] text-orange-600/80">ຍັງບໍ່ທັນໄດ້ຮັບ</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bills Management Card -->
+    <div class="bg-white rounded-3xl shadow-sm border border-slate-200/80 p-4 sm:p-6 space-y-4">
+      
+      <!-- Top Action Toolbar -->
+      <div class="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3 pb-3 border-b border-slate-100">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-2xl bg-red-50 text-red-600 flex items-center justify-center font-bold text-base shadow-2xs">
+            <i class="fas fa-file-invoice"></i>
+          </div>
+          <div>
+            <h2 class="text-base font-bold text-slate-900 flex items-center gap-2">
+              ລາຍການໃບບິນ
+              <span id="carrier-active-badge" class="bg-slate-900 text-white text-[10px] px-2 py-0.5 rounded-full font-bold">ທຸກຂົນສົ່ງ</span>
+            </h2>
+            <p class="text-xs text-slate-500">ຈັດການ, ສົ່ງ WhatsApp, ແຈ້ງເຕືອນ ແລະ ຕິດຕາມສະຖານະ</p>
+          </div>
+        </div>
+
+        <!-- Batch Action Buttons -->
+        <div class="flex flex-wrap items-center gap-1.5 sm:gap-2">
+          <button onclick="sendAllWhatsApp()" id="btn-notify-all-wa" class="text-xs bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-3 py-1.5 rounded-lg shadow-sm transition flex items-center gap-1.5 hover:scale-[1.02] active:scale-95 cursor-pointer">
+            <i class="fab fa-whatsapp text-sm"></i> ສົ່ງໃບບິນ (<span id="btn-cnt-unsent">0</span>)
+          </button>
+          <button onclick="sendAllArrivalReminders()" id="btn-notify-all-dest" class="text-xs bg-amber-600 hover:bg-amber-700 text-white font-semibold px-2.5 py-1.5 rounded-lg shadow-sm transition flex items-center gap-1.5 hover:scale-[1.02] active:scale-95 cursor-pointer">
+            <i class="fas fa-bell"></i> ເຕືອນປາຍທາງ (<span id="btn-cnt-dest">0</span>)
+          </button>
+          <button onclick="sendAllReturnedNotifications()" id="btn-notify-all-ret" class="text-xs bg-rose-600 hover:bg-rose-700 text-white font-semibold px-2.5 py-1.5 rounded-lg shadow-sm transition flex items-center gap-1.5 hover:scale-[1.02] active:scale-95 cursor-pointer">
+            <i class="fas fa-undo-alt"></i> ແຈ້ງຕີກັບ (<span id="btn-cnt-ret">0</span>)
+          </button>
+          <button onclick="markAllAsSent()" title="ໝາຍວ່າສົ່ງໃບບິນແລ້ວທັງໝົດ ເພື່ອນັບສະເພາະບິນໃໝ່ຫຼັງຈາກນີ້" class="text-xs bg-slate-800 hover:bg-slate-900 text-white font-semibold px-2.5 py-1.5 rounded-lg shadow-sm transition flex items-center gap-1.5 cursor-pointer">
+            <i class="fas fa-check-double text-emerald-400"></i> ໝາຍສົ່ງໝົດ
+          </button>
+          <button onclick="markAllRemindersAsSent()" title="ໝາຍວ່າແຈ້ງເຕືອນຮອດປາຍທາງແລ້ວທັງໝົດ ເພື່ອນັບຮອບເຕືອນຫຼັງຈາກນີ້" class="text-xs bg-slate-800 hover:bg-slate-900 text-white font-semibold px-2.5 py-1.5 rounded-lg shadow-sm transition flex items-center gap-1.5 cursor-pointer">
+            <i class="fas fa-bell-slash text-amber-400"></i> ໝາຍເຕືອນໝົດ
+          </button>
+          <button onclick="hideAllDelivered()" title="ຊ່ອນບິນທີ່ລູກຄ້າຮັບເຄື່ອງສຳເລັດແລ້ວທັງໝົດ" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold px-2.5 py-1.5 rounded-lg shadow-2xs transition flex items-center gap-1 cursor-pointer">
+            <i class="fas fa-eye-slash text-slate-500"></i> ຊ່ອນບິນສຳເລັດ
+          </button>
+          <button onclick="unhideAllBills()" title="ຍົກເລີກການຊ່ອນ ແລະ ສະແດງບິນທັງໝົດຄືນ" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold px-2.5 py-1.5 rounded-lg shadow-2xs transition flex items-center gap-1 cursor-pointer">
+            <i class="fas fa-eye text-amber-600"></i> ສະແດງທັງໝົດ
+          </button>
+          <button onclick="openImportModal()" class="text-xs bg-red-600 hover:bg-red-700 text-white font-semibold px-2.5 py-1.5 rounded-lg shadow-sm transition flex items-center gap-1.5 cursor-pointer">
+            <i class="fas fa-file-import"></i> ດຶງເລກບິນ
+          </button>
+          <button onclick="loadBills()" class="text-xs bg-slate-100 hover:bg-slate-200 px-2.5 py-1.5 rounded-lg text-slate-700 font-medium transition cursor-pointer">
+            <i class="fas fa-sync-alt mr-1"></i> ອັບເດດ
+          </button>
+        </div>
+      </div>
+
+      <!-- Filters & Search Toolbar -->
+      <div id="filters-container" class="space-y-3 mb-4 pb-4 border-b border-slate-100 transition-all duration-300">
+        <!-- Row 1: Carrier Filters & Search -->
+        <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 sm:gap-3">
+          <div class="flex items-center gap-1.5 text-xs overflow-x-auto no-scrollbar py-0.5 flex-nowrap sm:flex-wrap">
+            <span class="text-slate-400 font-medium text-[11px] mr-1 flex-shrink-0">ຂົນສົ່ງ:</span>
+            <button onclick="filterCarrier('all')" id="carrier-flt-all" class="px-2.5 py-1 rounded-lg font-bold bg-slate-800 text-white transition flex-shrink-0 cursor-pointer">
+              ທັງໝົດ (<span id="carrier-cnt-all">0</span>)
+            </button>
+            <button onclick="filterCarrier('Anousith Express')" id="carrier-flt-anousith" class="px-2.5 py-1 rounded-lg font-medium text-slate-600 hover:bg-slate-100 transition flex items-center gap-1 flex-shrink-0 cursor-pointer">
+              <span class="w-2 h-2 rounded-full bg-red-600"></span> Anousith (<span id="carrier-cnt-anousith">0</span>)
+            </button>
+            <button onclick="filterCarrier('HAL Express')" id="carrier-flt-hal" class="px-2.5 py-1 rounded-lg font-medium text-slate-600 hover:bg-slate-100 transition flex items-center gap-1 flex-shrink-0 cursor-pointer">
+              <span class="w-2 h-2 rounded-full bg-amber-500"></span> HAL Express (<span id="carrier-cnt-hal">0</span>)
+            </button>
+          </div>
+
+          <div class="relative min-w-[200px] sm:min-w-[220px]">
+            <i class="fas fa-search absolute left-3 top-2.5 text-slate-400 text-xs"></i>
+            <input type="text" id="table-search-input" oninput="renderFilteredBills()" placeholder="ຄົ້ນຫາເລກບິນ, ເບີໂທ, ສາຂາ..."
+              class="w-full pl-8 pr-3 py-1.5 text-xs rounded-xl border border-slate-200 focus:ring-2 focus:ring-red-500 outline-none" />
+          </div>
+        </div>
+
+        <!-- Row 2: Status Filters Toolbar (Horizontally swipeable on mobile) -->
+        <div class="flex items-center gap-1.5 text-xs overflow-x-auto no-scrollbar py-1 flex-nowrap sm:flex-wrap">
+          <span class="text-slate-400 font-medium text-[11px] mr-1 flex-shrink-0">ສະຖານະ:</span>
+          <button onclick="filterStatus('all')" id="flt-all" class="px-2.5 py-1 rounded-lg font-bold bg-slate-900 text-white shadow-xs transition flex-shrink-0 cursor-pointer">ທັງໝົດ (<span id="cnt-all">0</span>)</button>
+          <button onclick="filterStatus('unsent')" id="flt-unsent" class="px-2.5 py-1 rounded-lg font-bold bg-amber-500 text-slate-950 hover:bg-amber-400 shadow-2xs transition flex-shrink-0 cursor-pointer">⏳ ຍັງບໍ່ໄດ້ສົ່ງບິນ (<span id="cnt-unsent">0</span>)</button>
+          <button onclick="filterStatus('transit')" id="flt-transit" class="px-2.5 py-1 rounded-lg font-medium text-slate-600 hover:bg-slate-100 transition flex-shrink-0 cursor-pointer">🚚 ກຳລັງສົ່ງ (<span id="cnt-transit">0</span>)</button>
+          <button onclick="filterStatus('dest')" id="flt-dest" class="px-2.5 py-1 rounded-lg font-medium text-slate-600 hover:bg-slate-100 transition flex-shrink-0 cursor-pointer">📍 ຮອດປາຍທາງ (<span id="cnt-dest">0</span>)</button>
+          <button onclick="filterStatus('remind0')" id="flt-remind0" class="px-2.5 py-1 rounded-lg font-medium text-slate-600 hover:bg-slate-100 transition flex-shrink-0 cursor-pointer">⚪ ຍັງບໍ່ເຕືອນ (<span id="cnt-remind0">0</span>)</button>
+          <button onclick="filterStatus('remind1')" id="flt-remind1" class="px-2.5 py-1 rounded-lg font-medium text-amber-800 hover:bg-amber-50 transition flex-shrink-0 cursor-pointer">🟡 ເຕືອນຄັ້ງ 1 (<span id="cnt-remind1">0</span>)</button>
+          <button onclick="filterStatus('remind2')" id="flt-remind2" class="px-2.5 py-1 rounded-lg font-medium text-orange-800 hover:bg-orange-50 transition flex-shrink-0 cursor-pointer">🟠 ເຕືອນຄັ້ງ 2 (<span id="cnt-remind2">0</span>)</button>
+          <button onclick="filterStatus('remind3plus')" id="flt-remind3plus" class="px-2.5 py-1 rounded-lg font-medium text-purple-800 hover:bg-purple-50 transition flex-shrink-0 cursor-pointer">🟣 ເຕືອນ 3+ (<span id="cnt-remind3plus">0</span>)</button>
+          <button onclick="filterStatus('done')" id="flt-done" class="px-2.5 py-1 rounded-lg font-medium text-emerald-800 hover:bg-emerald-50 transition flex-shrink-0 cursor-pointer">✅ ສຳເລັດ (<span id="cnt-done">0</span>)</button>
+          <button onclick="filterStatus('ret')" id="flt-ret" class="px-2.5 py-1 rounded-lg font-medium text-rose-800 hover:bg-rose-50 transition flex-shrink-0 cursor-pointer">↩️ ຕີກັບ (<span id="cnt-ret">0</span>)</button>
+          <button onclick="filterStatus('failed')" id="flt-failed" class="px-2.5 py-1 rounded-lg font-medium text-red-800 hover:bg-red-50 transition flex-shrink-0 cursor-pointer">❌ ສົ່ງບໍ່ໄດ້ (<span id="cnt-failed">0</span>)</button>
+          <button onclick="filterStatus('hidden')" id="flt-hidden" class="px-2.5 py-1 rounded-lg font-medium text-slate-600 hover:bg-slate-100 transition flex items-center gap-1 flex-shrink-0 cursor-pointer"><i class="fas fa-eye-slash text-xs text-slate-500"></i> ບິນທີ່ຊ່ອນ (<span id="cnt-hidden">0</span>)</button>
+        </div>
+
+        <!-- Row 2.5: Arrival Reminder Frequency Breakdown (ກົດເພື່ອເລືອກກັ່ນຕອງເບິ່ງໄດ້ເລີຍ) -->
+        <div class="bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-slate-50 p-3 rounded-2xl border border-amber-200/90 shadow-xs flex flex-col lg:flex-row items-start lg:items-center justify-between gap-3">
+          <div class="flex items-center gap-2.5">
+            <div class="w-8 h-8 rounded-xl bg-amber-500 text-white flex items-center justify-center font-bold text-xs shadow-xs flex-shrink-0">
+              <i class="fas fa-bell"></i>
+            </div>
+            <div>
+              <div class="text-xs font-bold text-slate-900 flex items-center gap-1.5 flex-wrap">
+                <span>ຮອບແຈ້ງເຕືອນ WhatsApp (ກົດກັ່ນຕອງໄດ້):</span>
+                <span id="reminder-carrier-label" class="bg-slate-200 text-slate-800 text-[10px] font-bold px-2 py-0.5 rounded-full border border-slate-300">ທັງໝົດ</span>
+              </div>
+              <p class="text-[11px] text-slate-500">ກົດໃສ່ບັດແຕ່ລະຮອບດ້ານລຸ່ມນີ້ ເພື່ອກັ່ນຕອງເບິ່ງລາຍຊື່ບິນສະເພາະຮອບນັ້ນໆ</p>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 w-full lg:w-auto">
+            <!-- 0 Times (Not yet reminded) -->
+            <button type="button" onclick="filterStatus('remind0')" id="card-filter-remind0"
+              class="text-left bg-slate-100/90 hover:bg-slate-200/90 px-3 py-1.5 rounded-xl border border-slate-300 shadow-xs flex items-center justify-between gap-2 transition cursor-pointer hover:scale-[1.02]">
+              <div class="text-[11px] font-bold text-slate-700 flex items-center gap-1.5">
+                <span class="w-2.5 h-2.5 rounded-full bg-slate-500"></span> ຍັງບໍ່ເຕືອນ:
+              </div>
+              <div id="stat-remind-0" class="font-bold text-xs text-slate-900 font-mono bg-white px-2 py-0.5 rounded-lg border border-slate-300 shadow-2xs">0 ຄົນ</div>
+            </button>
+
+            <!-- 1st Reminder -->
+            <button type="button" onclick="filterStatus('remind1')" id="card-filter-remind1"
+              class="text-left bg-amber-100/90 hover:bg-amber-200/90 px-3 py-1.5 rounded-xl border border-amber-300 shadow-xs flex items-center justify-between gap-2 transition cursor-pointer hover:scale-[1.02]">
+              <div class="text-[11px] font-bold text-amber-950 flex items-center gap-1.5">
+                <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span> ເຕືອນຄັ້ງ 1:
+              </div>
+              <div id="stat-remind-1" class="font-bold text-xs text-amber-950 font-mono bg-white px-2 py-0.5 rounded-lg border border-amber-300 shadow-2xs">0 ຄົນ</div>
+            </button>
+
+            <!-- 2nd Reminder -->
+            <button type="button" onclick="filterStatus('remind2')" id="card-filter-remind2"
+              class="text-left bg-orange-100/90 hover:bg-orange-200/90 px-3 py-1.5 rounded-xl border border-orange-300 shadow-xs flex items-center justify-between gap-2 transition cursor-pointer hover:scale-[1.02]">
+              <div class="text-[11px] font-bold text-orange-950 flex items-center gap-1.5">
+                <span class="w-2.5 h-2.5 rounded-full bg-orange-600"></span> ເຕືອນຄັ້ງ 2:
+              </div>
+              <div id="stat-remind-2" class="font-bold text-xs text-orange-950 font-mono bg-white px-2 py-0.5 rounded-lg border border-orange-300 shadow-2xs">0 ຄົນ</div>
+            </button>
+
+            <!-- 3+ Reminders -->
+            <button type="button" onclick="filterStatus('remind3plus')" id="card-filter-remind3plus"
+              class="text-left bg-purple-100/90 hover:bg-purple-200/90 px-3 py-1.5 rounded-xl border border-purple-300 shadow-xs flex items-center justify-between gap-2 transition cursor-pointer hover:scale-[1.02]">
+              <div class="text-[11px] font-bold text-purple-950 flex items-center gap-1.5">
+                <span class="w-2.5 h-2.5 rounded-full bg-purple-600 animate-pulse"></span> ເຕືອນ 3+ ຄັ້ງ:
+              </div>
+              <div id="stat-remind-3plus" class="font-bold text-xs text-purple-950 font-mono bg-white px-2 py-0.5 rounded-lg border border-purple-300 shadow-2xs">0 ຄົນ</div>
+            </button>
+          </div>
+        </div>
+
+        <!-- Row 2: Date Filters Toolbar -->
+        <div class="flex flex-wrap items-center justify-between gap-3 bg-slate-50 p-2.5 rounded-xl border border-slate-200/80 text-xs">
+          <div class="flex flex-wrap items-center gap-1.5">
+            <span class="text-slate-700 font-bold text-xs flex items-center gap-1 mr-1">
+              <i class="far fa-calendar-alt text-red-500"></i> ກັ່ນຕອງວັນທີ:
+            </span>
+            <button onclick="setDatePreset('all')" id="date-btn-all" class="px-2.5 py-1 rounded-lg font-bold bg-white border border-slate-300 text-slate-900 shadow-xs transition">
+              ທຸກວັນທີ
+            </button>
+            <button onclick="setDatePreset('today')" id="date-btn-today" class="px-2.5 py-1 rounded-lg font-medium text-slate-600 hover:bg-white transition">
+              ມື້ນີ້
+            </button>
+            <button onclick="setDatePreset('7days')" id="date-btn-7days" class="px-2.5 py-1 rounded-lg font-medium text-slate-600 hover:bg-white transition">
+              7 ມື້ຫຼ້າສຸດ
+            </button>
+            <button onclick="setDatePreset('30days')" id="date-btn-30days" class="px-2.5 py-1 rounded-lg font-medium text-slate-600 hover:bg-white transition">
+              30 ມື້ຫຼ້າສຸດ
+            </button>
+          </div>
+
+          <!-- Date Range Inputs -->
+          <div class="flex items-center gap-2">
+            <div class="flex items-center gap-1.5">
+              <span class="text-slate-400 text-[11px]">ແຕ່ວັນທີ:</span>
+              <input type="date" id="date-filter-from" onchange="applyCustomDateRange()"
+                class="bg-white text-xs px-2.5 py-1 rounded-lg border border-slate-300 focus:ring-2 focus:ring-red-500 outline-none font-mono text-slate-700 shadow-xs" />
+            </div>
+            <div class="flex items-center gap-1.5">
+              <span class="text-slate-400 text-[11px]">ຫາວັນທີ:</span>
+              <input type="date" id="date-filter-to" onchange="applyCustomDateRange()"
+                class="bg-white text-xs px-2.5 py-1 rounded-lg border border-slate-300 focus:ring-2 focus:ring-red-500 outline-none font-mono text-slate-700 shadow-xs" />
+            </div>
+            <button onclick="clearDateFilter()" title="ລ້າງວັນທີ"
+              class="px-2 py-1 text-slate-500 hover:text-slate-800 hover:bg-white rounded-lg transition text-[11px] font-semibold border border-transparent hover:border-slate-200">
+              <i class="fas fa-rotate-left mr-0.5"></i> ລ້າງ
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Batch Import Modal -->
+      <div id="import-modal" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-white rounded-2xl max-w-lg w-full p-6 space-y-4 shadow-2xl">
+          <div class="flex items-center justify-between border-b pb-3">
+            <h3 class="font-bold text-slate-900 text-base flex items-center gap-2">
+              <i class="fas fa-cloud-download-alt text-red-600"></i>
+              ດຶງຂໍ້ມູນ & ນຳເຂົ້າເລກບິນ Anousith
+            </h3>
+            <button onclick="closeImportModal()" class="text-slate-400 hover:text-slate-600 text-lg">&times;</button>
+          </div>
+          <p class="text-xs text-slate-500">
+            ວາງເລກບິນ / Tracking Number ທີ່ຕ້ອງການດຶງ (ສາມາດໃສ່ໄດ້ຫຼາຍເລກ ໂດຍແຍກແຖວລະ 1 ເລກ ຫຼື ຂັ້ນດ້ວຍຈຸດ):
+          </p>
+          <textarea id="import-tracking-input" rows="5" placeholder="8707221950159&#10;8707221950160&#10;8707221950161"
+            class="w-full text-xs font-mono p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-red-500 outline-none"></textarea>
+          
+          <div class="flex items-center justify-end gap-3 pt-2">
+            <button onclick="closeImportModal()" class="px-4 py-2 text-xs font-semibold text-slate-600 bg-slate-100 rounded-xl hover:bg-slate-200">
+              ຍົກເລີກ
+            </button>
+            <button onclick="submitBatchImport()" id="btn-submit-import" class="px-4 py-2 text-xs font-semibold text-white bg-red-600 rounded-xl hover:bg-red-700 shadow flex items-center gap-1.5">
+              <i class="fas fa-download"></i> ດຶງຂໍ້ມູນທັນທີ
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Reminder History Log Modal -->
+      <div id="history-modal" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl">
+          <div class="flex items-center justify-between border-b pb-3">
+            <h3 class="font-bold text-slate-900 text-base flex items-center gap-2">
+              <i class="fas fa-history text-amber-600"></i>
+              ປະຫວັດການເຕືອນ WhatsApp
+            </h3>
+            <button onclick="closeHistoryModal()" class="text-slate-400 hover:text-slate-600 text-lg">&times;</button>
+          </div>
+          <div id="history-modal-content" class="space-y-3 text-xs max-h-80 overflow-y-auto">
+            <!-- Dynamic logs -->
+          </div>
+          <div class="flex justify-end pt-2 border-t">
+            <button onclick="closeHistoryModal()" class="px-4 py-2 text-xs font-semibold text-slate-600 bg-slate-100 rounded-xl hover:bg-slate-200">
+              ປິດ
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Live Progress & Completion Summary Modal -->
+      <div id="progress-modal" class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-white rounded-3xl max-w-xl w-full p-6 space-y-4 shadow-2xl border border-slate-100 overflow-hidden flex flex-col max-h-[90vh]">
+          
+          <!-- Modal Header -->
+          <div class="flex items-center justify-between border-b pb-3.5">
+            <div class="flex items-center gap-2.5">
+              <div id="progress-icon-box" class="w-10 h-10 rounded-2xl bg-red-100 text-red-600 flex items-center justify-center text-lg font-bold shadow-xs">
+                <i class="fab fa-whatsapp animate-bounce"></i>
+              </div>
+              <div>
+                <h3 id="progress-modal-title" class="font-bold text-slate-900 text-base">ກຳລັງສົ່ງຂໍ້ຄວາມ WhatsApp...</h3>
+                <p id="progress-modal-subtitle" class="text-xs text-slate-500">ລະບົບກຳລັງກວດສອບເບີ ແລະ ສົ່ງໃບບິນພ້ອມຮູບພາບ</p>
+              </div>
+            </div>
+            <button onclick="closeProgressModal()" id="btn-close-progress" class="text-slate-400 hover:text-slate-700 text-xl p-1 rounded-lg transition">&times;</button>
+          </div>
+
+          <!-- Progress Bar Section -->
+          <div id="progress-bar-container" class="space-y-2 bg-slate-50 p-4 rounded-2xl border border-slate-200/80">
+            <div class="flex items-center justify-between text-xs">
+              <span class="font-semibold text-slate-700 flex items-center gap-1.5">
+                <i class="fas fa-spinner fa-spin text-red-500" id="progress-spinner"></i>
+                <span id="progress-status-label">ກຳລັງດຳເນີນການ...</span>
+              </span>
+              <span id="progress-percentage" class="font-mono font-bold text-red-600">0%</span>
+            </div>
+
+            <div class="w-full bg-slate-200 rounded-full h-3 overflow-hidden shadow-inner">
+              <div id="progress-bar-fill" class="bg-gradient-to-r from-red-500 via-amber-500 to-emerald-500 h-3 rounded-full transition-all duration-300" style="width: 0%"></div>
+            </div>
+
+            <div class="flex items-center justify-between text-[11px] font-mono text-slate-500 pt-1">
+              <div>ສົ່ງແລ້ວ: <strong id="progress-count-current" class="text-slate-800">0</strong> / <span id="progress-count-total">0</span></div>
+              <div class="flex items-center gap-2">
+                <span class="text-emerald-700 font-semibold flex items-center gap-1"><i class="fas fa-check-circle"></i> ສຳເລັດ: <span id="progress-count-success">0</span></span>
+                <span class="text-rose-600 font-semibold flex items-center gap-1"><i class="fas fa-times-circle"></i> ບໍ່ໄດ້: <span id="progress-count-failed">0</span></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Live Streaming Activity Log -->
+          <div class="space-y-1.5 flex-1 min-h-[140px] flex flex-col">
+            <div class="flex items-center justify-between text-xs font-semibold text-slate-700">
+              <span><i class="fas fa-list-ul mr-1 text-slate-400"></i> ລາຍລະອຽດການສົ່ງແຕ່ລະບິນ:</span>
+              <span id="progress-live-badge" class="text-[10px] bg-red-100 text-red-700 px-2 py-0.5 rounded-full font-bold animate-pulse">LIVE</span>
+            </div>
+            <div id="progress-logs" class="flex-1 max-h-48 overflow-y-auto bg-slate-900 text-slate-200 text-xs p-3.5 rounded-2xl font-mono space-y-1.5 shadow-inner">
+              <!-- Live stream entries -->
+            </div>
+          </div>
+
+          <!-- Final Summary Report (Shown when done or when failures exist) -->
+          <div id="progress-summary-container" class="hidden space-y-3 pt-2 border-t">
+            <div class="grid grid-cols-3 gap-2 text-center text-xs">
+              <div class="bg-slate-100 p-2.5 rounded-xl">
+                <div class="text-[10px] text-slate-500">ທັງໝົດ</div>
+                <div id="sum-total" class="text-base font-bold text-slate-900 font-mono">0</div>
+              </div>
+              <div class="bg-emerald-50 border border-emerald-200 p-2.5 rounded-xl">
+                <div class="text-[10px] text-emerald-700 font-semibold">✅ ສຳເລັດ</div>
+                <div id="sum-success" class="text-base font-bold text-emerald-800 font-mono">0</div>
+              </div>
+              <div class="bg-rose-50 border border-rose-200 p-2.5 rounded-xl">
+                <div class="text-[10px] text-rose-700 font-semibold">❌ ສົ່ງບໍ່ໄດ້</div>
+                <div id="sum-failed" class="text-base font-bold text-rose-800 font-mono">0</div>
+              </div>
+            </div>
+
+            <!-- Failed Items Table / Breakdown -->
+            <div id="failed-section" class="hidden space-y-1.5">
+              <div class="flex items-center justify-between text-xs">
+                <span class="font-bold text-rose-700 flex items-center gap-1">
+                  <i class="fas fa-exclamation-triangle"></i> ລາຍການທີ່ບໍ່ມີ WhatsApp / ສົ່ງບໍ່ໄດ້:
+                </span>
+                <button onclick="copyFailedNumbers()" class="text-[11px] bg-rose-100 hover:bg-rose-200 text-rose-800 font-semibold px-2 py-0.5 rounded-lg transition">
+                  <i class="fas fa-copy mr-1"></i> ກັອບປີ້ເບີທັງໝົດ
+                </button>
+              </div>
+              <div class="max-h-36 overflow-y-auto border border-rose-200 rounded-xl bg-rose-50/30">
+                <table class="w-full text-left text-[11px]">
+                  <thead class="bg-rose-100/60 text-rose-900 font-semibold">
+                    <tr>
+                      <th class="py-1.5 px-2.5">ເລກບິນ</th>
+                      <th class="py-1.5 px-2.5">ຜູ້ຮັບ & ເບີໂທ</th>
+                      <th class="py-1.5 px-2.5">ສາເຫດ</th>
+                    </tr>
+                  </thead>
+                  <tbody id="failed-table-body" class="divide-y divide-rose-100 text-slate-700 font-mono">
+                    <!-- Dynamic failed rows -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- Modal Footer Actions -->
+          <div class="flex items-center justify-between pt-3 border-t">
+            <div class="text-[11px] text-slate-400" id="progress-footer-msg">
+              ກະລຸນາຢ່າປິດໜ້າຈໍຂະນະທີ່ກຳລັງສົ່ງ...
+            </div>
+            <div class="flex items-center gap-2">
+              <button id="btn-finish-progress" onclick="closeProgressModal()" class="px-5 py-2 text-xs font-bold text-white bg-slate-800 hover:bg-slate-900 rounded-xl shadow transition">
+                ປິດໜ້າຕ່າງ
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Sync & Update Status Modal (Loading + Exact Update Summary) -->
+      <div id="sync-status-modal" class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-3xl max-w-lg w-full p-6 space-y-4 shadow-2xl border border-slate-100 overflow-hidden flex flex-col max-h-[90vh]">
+          
+          <!-- Header -->
+          <div class="flex items-center justify-between border-b pb-3.5">
+            <div class="flex items-center gap-2.5">
+              <div id="sync-modal-icon" class="w-10 h-10 rounded-2xl bg-red-100 text-red-600 flex items-center justify-center text-lg font-bold shadow-xs">
+                <i class="fas fa-sync-alt" id="sync-modal-spinner"></i>
+              </div>
+              <div>
+                <h3 id="sync-modal-title" class="font-bold text-slate-900 text-base">ກຳລັງກວດສອບ & ອັບເດດຂໍ້ມູນ...</h3>
+                <p id="sync-modal-subtitle" class="text-xs text-slate-500">ລະບົບກຳລັງເຊື່ອມຕໍ່ Anousith & HAL Express</p>
+              </div>
+            </div>
+            <button onclick="closeSyncModal()" class="text-slate-400 hover:text-slate-700 text-xl p-1 rounded-lg transition">&times;</button>
+          </div>
+
+          <!-- Loading Body -->
+          <div id="sync-loading-body" class="py-8 text-center space-y-4">
+            <div class="relative w-20 h-20 mx-auto flex items-center justify-center">
+              <div class="w-20 h-20 rounded-full border-4 border-slate-100 border-t-red-600 animate-spin"></div>
+              <i class="fas fa-cloud-download-alt text-2xl text-red-600 absolute animate-pulse"></i>
+            </div>
+            <div class="space-y-1">
+              <div class="font-bold text-sm text-slate-800">ກຳລັງດຶງສະຖານະລ່າສຸດຈາກລະບົບ...</div>
+              <p class="text-xs text-slate-400">ກວດສອບເລກບິນໃໝ່, ການປ່ຽນແປງສະຖານະ, ແລະ ຍອດ COD</p>
+            </div>
+            <div class="flex items-center justify-center gap-2 text-[11px] text-slate-600 bg-slate-50 p-2.5 rounded-xl border border-slate-200/80 max-w-xs mx-auto">
+              <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+              <span>ກວດສອບທັງ Anousith & HAL Express</span>
+            </div>
+          </div>
+
+          <!-- Completed Result Body (Exact Update Breakdown) -->
+          <div id="sync-result-body" class="space-y-4 hidden">
+            <!-- Status Alert Banner -->
+            <div id="sync-result-banner" class="p-3.5 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-950 flex items-start gap-3">
+              <div id="sync-result-badge-icon" class="w-7 h-7 rounded-xl bg-emerald-600 text-white flex items-center justify-center flex-shrink-0 mt-0.5 shadow-xs">
+                <i class="fas fa-check"></i>
+              </div>
+              <div class="text-xs space-y-0.5">
+                <div id="sync-result-headline" class="font-bold text-sm text-emerald-900">ອັບເດດຂໍ້ມູນສຳເລັດແລ້ວ!</div>
+                <div id="sync-result-desc" class="text-emerald-800">ພົບການປ່ຽນແປງ ແລະ ອັບເດດສະຖານະແລ້ວ</div>
+              </div>
+            </div>
+
+            <!-- Stats Metric Grid -->
+            <div class="grid grid-cols-3 gap-2.5 text-center text-xs">
+              <div class="bg-blue-50 border border-blue-200/80 p-3 rounded-2xl">
+                <div class="text-[10px] text-blue-700 font-semibold mb-0.5">📦 ບິນໃໝ່</div>
+                <div id="sync-stat-new" class="text-lg font-black text-blue-900 font-mono">+0</div>
+                <div class="text-[9px] text-blue-600/80">ລາຍການ</div>
+              </div>
+              <div class="bg-amber-50 border border-amber-200/80 p-3 rounded-2xl">
+                <div class="text-[10px] text-amber-700 font-semibold mb-0.5">📍 ຮອດປາຍທາງ</div>
+                <div id="sync-stat-dest" class="text-lg font-black text-amber-900 font-mono">+0</div>
+                <div class="text-[9px] text-amber-600/80">ລາຍການໃໝ່</div>
+              </div>
+              <div class="bg-emerald-50 border border-emerald-200/80 p-3 rounded-2xl">
+                <div class="text-[10px] text-emerald-700 font-semibold mb-0.5">✅ ຮັບແລ້ວ</div>
+                <div id="sync-stat-done" class="text-lg font-black text-emerald-900 font-mono">+0</div>
+                <div class="text-[9px] text-emerald-600/80">ສຳເລັດ</div>
+              </div>
+            </div>
+
+            <!-- Details Changelog List -->
+            <div class="space-y-1.5">
+              <div class="flex items-center justify-between text-xs font-semibold text-slate-700">
+                <span><i class="fas fa-list-check text-slate-400 mr-1"></i> ລາຍລະອຽດການອັບເດດ:</span>
+                <span id="sync-time-badge" class="text-[10px] font-mono text-slate-400 font-normal">ເວລາ 12:25:00</span>
+              </div>
+              <div id="sync-details-list" class="max-h-48 overflow-y-auto space-y-1.5 text-xs bg-slate-50 p-3 rounded-2xl border border-slate-200">
+                <!-- Populated dynamically -->
+              </div>
+            </div>
+          </div>
+
+          <!-- Footer -->
+          <div class="flex items-center justify-between pt-3 border-t">
+            <div class="text-[11px] text-slate-400" id="sync-footer-hint">
+              ກວດສອບຂໍ້ມູນອັດຕະໂນມັດ 24/7
+            </div>
+            <button onclick="closeSyncModal()" class="px-5 py-2 text-xs font-bold text-white bg-slate-800 hover:bg-slate-900 rounded-xl shadow transition">
+              ຮັບຊາບ & ປິດ
+            </button>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Floating Real-Time Toast Notification Container -->
+      <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 max-w-sm pointer-events-auto"></div>
+
+      <!-- Anousith & HAL Express Login & Multi-Account Management Modal -->
+      <div id="login-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-3xl shadow-2xl border border-slate-200 max-w-md w-full overflow-hidden">
+          
+          <!-- Header (Dynamic styling for carrier) -->
+          <div id="login-modal-header" class="bg-gradient-to-r from-red-600 to-red-700 px-6 py-4 flex items-center justify-between text-white transition-colors duration-300">
+            <div class="flex items-center gap-2.5">
+              <div id="login-modal-icon" class="w-8 h-8 rounded-xl bg-white/20 flex items-center justify-center font-bold text-sm">
+                <i class="fas fa-store"></i>
+              </div>
+              <div>
+                <h3 id="login-modal-title" class="font-bold text-sm">ຈັດການບັນຊີ Anousith Express</h3>
+                <p id="login-modal-subtitle" class="text-[11px] text-red-100">ເຂົ້າສູ່ລະບົບເພື່ອໃຫ້ຄົນອື່ນ / ຮ້ານອື່ນໃຊ້ງານໄດ້</p>
+              </div>
+            </div>
+            <button onclick="closeLoginModal()" class="text-white/80 hover:text-white p-1 rounded-lg transition text-base">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+
+          <div class="p-6 space-y-4">
+            <!-- Carrier Selector Tabs (Anousith vs HAL Express) -->
+            <div class="grid grid-cols-2 gap-1.5 p-1 bg-slate-100 rounded-2xl">
+              <button type="button" id="modal-carrier-anousith" onclick="switchModalCarrier('anousith')"
+                class="py-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 bg-white text-red-600 shadow-xs">
+                <i class="fas fa-store"></i> 🔴 Anousith
+              </button>
+              <button type="button" id="modal-carrier-hal" onclick="switchModalCarrier('hal')"
+                class="py-2 rounded-xl text-xs font-semibold transition flex items-center justify-center gap-1.5 text-slate-600 hover:text-slate-900">
+                <i class="fas fa-bolt text-amber-500"></i> ⚡ HAL Express
+              </button>
+            </div>
+
+            <!-- Account Switcher / Sub-Tabs (New Login vs Saved Accounts) -->
+            <div class="flex bg-slate-100 p-1 rounded-xl gap-1">
+              <button id="tab-login-new" onclick="switchLoginTab('login')" class="flex-1 py-1.5 rounded-lg text-xs font-bold bg-white text-slate-900 shadow-sm transition">
+                <i class="fas fa-key mr-1 text-red-500" id="tab-login-icon"></i> ເຂົ້າສູ່ລະບົບໃໝ່
+              </button>
+              <button id="tab-saved-accounts" onclick="switchLoginTab('saved')" class="flex-1 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 transition">
+                <i class="fas fa-users mr-1 text-blue-500"></i> ບັນຊີທີ່ບັນທຶກ (<span id="saved-count">0</span>)
+              </button>
+            </div>
+
+            <!-- Tab 1: Login Form -->
+            <form id="carrier-login-form" onsubmit="handleCarrierLogin(event)" class="space-y-3.5">
+              
+              <!-- Phone Format Helper / Instruction Banner -->
+              <div id="phone-format-hint" class="flex items-start gap-2.5 p-3 rounded-2xl text-xs bg-amber-50 text-amber-900 border border-amber-200 transition-colors">
+                <div id="phone-hint-icon" class="w-6 h-6 rounded-lg bg-amber-500/20 text-amber-700 flex items-center justify-center flex-shrink-0 mt-0.5 font-bold">
+                  <i class="fas fa-info-circle"></i>
+                </div>
+                <div class="space-y-1">
+                  <div class="font-bold flex items-center gap-1.5 flex-wrap">
+                    <span>ຮູບແບບເບີໂທ:</span>
+                    <span id="phone-format-example" class="font-mono text-amber-950 font-black bg-amber-200/80 px-2 py-0.5 rounded-lg text-[11px]">+85620XXXXXXXX</span>
+                  </div>
+                  <p id="phone-format-desc" class="text-[11px] text-amber-800 leading-relaxed">
+                    ໃສ່ພຽງ <strong>20...</strong> ຫຼື <strong>020...</strong> (ລະບົບຈະລັອກ <strong>+856</strong> ໃຫ້ອັດຕະໂນມັດ 100%)
+                  </p>
+                </div>
+              </div>
+
+              <!-- Phone Input with Fixed Prefix Addon (แบบ 1) -->
+              <div>
+                <label id="lbl-login-phone" class="block text-xs font-bold text-slate-700 mb-1">
+                  <i class="fas fa-phone mr-1 text-slate-400"></i> ເບີໂທລະສັບ HAL Express *
+                </label>
+                <div id="phone-input-wrapper" class="flex items-center rounded-xl border border-slate-300 focus-within:ring-2 focus-within:ring-amber-500 overflow-hidden bg-slate-50 transition shadow-inner">
+                  <!-- Fixed Prefix Badge -->
+                  <div class="flex items-center gap-1.5 px-3 py-2.5 bg-slate-100 border-r border-slate-200 text-slate-800 font-bold text-xs select-none">
+                    <span class="text-base leading-none">🇱🇦</span>
+                    <span class="font-mono text-slate-900 font-black">+856</span>
+                  </div>
+                  <!-- Main Phone Input -->
+                  <input type="text" id="login-phone" placeholder="2028372583 ຫຼື 020..." required
+                    oninput="formatLoginPhoneInput(this)"
+                    class="flex-1 text-xs font-mono font-bold px-3 py-2.5 bg-white text-slate-900 placeholder:text-slate-400 placeholder:font-normal focus:outline-none" />
+                </div>
+                <!-- Live Output Preview -->
+                <div class="mt-1.5 flex items-center justify-between text-[11px] text-slate-500 px-1">
+                  <span>ເບີທີ່ຈະຖືກບັນທຶກ: <strong id="phone-live-preview" class="font-mono text-amber-700 font-bold">+85620XXXXXXXX</strong></span>
+                  <span class="text-slate-400 text-[10px]">(ພິມ 20... ຫຼື 020...)</span>
+                </div>
+              </div>
+
+              <div>
+                <label id="lbl-login-password" class="block text-xs font-bold text-slate-700 mb-1">
+                  <i class="fas fa-lock mr-1 text-slate-400"></i> ລະຫັດຜ່ານ HAL Express *
+                </label>
+                <input type="password" id="login-password" placeholder="ປ້ອນລະຫັດຜ່ານ"
+                  class="w-full text-xs font-medium px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-amber-500 transition" />
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">
+                  <i class="fas fa-store mr-1 text-slate-400"></i> ຊື່ຮ້ານຄ້າ / ຊື່ຜູ້ໃຊ້ (ເລືອກໃສ່ໄດ້)
+                </label>
+                <input type="text" id="login-shopname" placeholder="ຕົວຢ່າງ: Savage shop / ຮ້ານ A"
+                  class="w-full text-xs font-medium px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-amber-500 transition" />
+              </div>
+
+              <div id="login-feedback" class="hidden text-xs p-3 rounded-xl"></div>
+
+              <button type="submit" id="btn-login-submit"
+                class="w-full bg-amber-500 hover:bg-amber-600 text-white font-bold py-2.5 px-4 rounded-xl text-xs flex items-center justify-center gap-2 shadow-sm transition">
+                <i class="fas fa-right-to-bracket"></i> ເຂົ້າສູ່ລະບົບ HAL Express
+              </button>
+            </form>
+
+            <!-- Tab 2: Saved Accounts List -->
+            <div id="saved-accounts-container" class="hidden space-y-3">
+              <div id="saved-accounts-list" class="space-y-2 max-h-60 overflow-y-auto pr-1">
+                <!-- Dynamically populated -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Color Code Legend / ຄວາມໝາຍຂອງແຖບສີ (ກົດເພື່ອເລືອກກັ່ນຕອງໄດ້ເລີຍ) -->
+      <div id="color-legend-bar" class="flex flex-wrap items-center justify-between gap-2.5 px-4 py-3 bg-slate-900 text-white text-xs rounded-2xl shadow-sm border border-slate-800 transition-all duration-300">
+        <div class="font-bold flex items-center gap-2 text-amber-400">
+          <i class="fas fa-palette text-sm"></i>
+          <span>ລະຫັດສີບິນ (ກົດກັ່ນຕອງໄດ້):</span>
+        </div>
+        <div id="color-legend-buttons" class="flex flex-wrap items-center gap-1.5 sm:gap-2">
+          <button type="button" onclick="filterStatus('done')" title="ກົດກັ່ນຕອງ: ຮັບເຄື່ອງແລ້ວ"
+            class="flex items-center gap-1.5 font-bold bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1 rounded-xl shadow-xs transition cursor-pointer hover:scale-105 active:scale-95 text-[11px]">
+            <i class="fas fa-check-circle"></i> ຮັບແລ້ວ (ສຳເລັດ)
+          </button>
+          <button type="button" onclick="filterStatus('transit')" title="ກົດກັ່ນຕອງ: ກຳລັງຂົນສົ່ງ"
+            class="flex items-center gap-1.5 font-bold bg-blue-600 hover:bg-blue-500 text-white px-3 py-1 rounded-xl shadow-xs transition cursor-pointer hover:scale-105 active:scale-95 text-[11px]">
+            <i class="fas fa-truck"></i> ກຳລັງສົ່ງ
+          </button>
+          <button type="button" onclick="filterStatus('remind0')" title="ກົດກັ່ນຕອງ: ຮອດປາຍທາງ ຍັງບໍ່ທັນເຕືອນ"
+            class="flex items-center gap-1.5 font-bold bg-slate-700 hover:bg-slate-600 text-slate-200 px-3 py-1 rounded-xl shadow-xs transition cursor-pointer hover:scale-105 active:scale-95 text-[11px]">
+            <i class="fas fa-map-marker-alt"></i> ປາຍທາງ (ຍັງບໍ່ເຕືອນ)
+          </button>
+          <button type="button" onclick="filterStatus('remind1')" title="ກົດກັ່ນຕອງ: ເຕືອນຄັ້ງທີ 1"
+            class="flex items-center gap-1.5 font-bold bg-amber-500 hover:bg-amber-400 text-slate-950 px-3 py-1 rounded-xl shadow-xs transition cursor-pointer hover:scale-105 active:scale-95 text-[11px]">
+            <i class="fas fa-bell"></i> ເຕືອນຄັ້ງ 1
+          </button>
+          <button type="button" onclick="filterStatus('remind2')" title="ກົດກັ່ນຕອງ: ເຕືອນຄັ້ງທີ 2"
+            class="flex items-center gap-1.5 font-bold bg-orange-500 hover:bg-orange-400 text-white px-3 py-1 rounded-xl shadow-xs transition cursor-pointer hover:scale-105 active:scale-95 text-[11px]">
+            <i class="fas fa-bell"></i> ເຕືອນຄັ້ງ 2
+          </button>
+          <button type="button" onclick="filterStatus('remind3plus')" title="ກົດກັ່ນຕອງ: ເຕືອນ 3+ ຄັ້ງ"
+            class="flex items-center gap-1.5 font-bold bg-purple-600 hover:bg-purple-500 text-white px-3 py-1 rounded-xl shadow-xs transition cursor-pointer hover:scale-105 active:scale-95 text-[11px]">
+            <i class="fas fa-bell animate-pulse"></i> ເຕືອນ 3+ ຄັ້ງ
+          </button>
+          <button type="button" onclick="filterStatus('ret')" title="ກົດກັ່ນຕອງ: ພັດສະດຸຕີກັບ"
+            class="flex items-center gap-1.5 font-bold bg-rose-600 hover:bg-rose-500 text-white px-3 py-1 rounded-xl shadow-xs transition cursor-pointer hover:scale-105 active:scale-95 text-[11px]">
+            <i class="fas fa-undo-alt"></i> ຕີກັບ
+          </button>
+          <button type="button" onclick="filterStatus('failed')" title="ກົດກັ່ນຕອງ: ສົ່ງບໍ່ໄດ້ / ບໍ່ມີ WhatsApp"
+            class="flex items-center gap-1.5 font-bold bg-red-700 hover:bg-red-600 text-white px-3 py-1 rounded-xl shadow-xs transition cursor-pointer hover:scale-105 active:scale-95 text-[11px]">
+            <i class="fas fa-times-circle"></i> ສົ່ງບໍ່ໄດ້
+          </button>
+        </div>
+      </div>
+
+      <!-- Card View for Mobile & Tablet (Default on mobile) -->
+      <div id="bills-cards-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+        <div class="col-span-full py-10 text-center text-slate-400 bg-slate-50/50 rounded-2xl border border-slate-200/80">
+          <i class="fas fa-inbox text-3xl mb-2 block text-slate-300"></i>
+          <span class="text-xs font-medium">ຍັງບໍ່ມີປະຫວັດການສົ່ງໃບບິນ</span>
+        </div>
+      </div>
+
+      <!-- Table View for Desktop / Detailed View -->
+      <div id="bills-table-container" class="overflow-x-auto hidden">
+        <table class="w-full text-left text-xs text-slate-600">
+          <thead class="bg-slate-100/90 text-slate-700 font-bold border-b border-slate-200 text-xs">
+            <tr>
+              <th class="py-3 px-3 text-center w-10">#</th>
+              <th class="py-3 px-3 text-center">ຂົນສົ່ງ</th>
+              <th class="py-3 px-3 whitespace-nowrap">ວັນທີຝາກ</th>
+              <th class="py-3 px-3">ເລກບິນ (Tracking)</th>
+              <th class="py-3 px-3">ຜູ້ຮັບ & WhatsApp</th>
+              <th class="py-3 px-3">ສາຂາປາຍທາງ</th>
+              <th class="py-3 px-3 font-bold text-slate-900">COD ຄວນເກັບ</th>
+              <th class="py-3 px-3 font-bold text-teal-800">COD ເກັບໄດ້</th>
+              <th class="py-3 px-3 text-center">ສະຖານະຂົນສົ່ງ</th>
+              <th class="py-3 px-3 text-center">WhatsApp ບິນ</th>
+              <th class="py-3 px-3 text-center">ແຈ້ງຮອດປາຍທາງ</th>
+              <th class="py-3 px-3 text-center">ຈັດການ</th>
+            </tr>
+          </thead>
+          <tbody id="bills-table-body" class="divide-y divide-slate-100">
+            <tr>
+              <td colspan="12" class="py-8 text-center text-slate-400">
+                <i class="fas fa-inbox text-2xl mb-2 block"></i>
+                ຍັງບໍ່ມີປະຫວັດການສົ່ງໃບບິນ
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Mobile Floating Sticky Quick Action Bar -->
+  <div class="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-slate-900/95 backdrop-blur-md text-white border-t border-slate-800 px-3 py-2 shadow-2xl">
+    <div class="flex items-center justify-between gap-1.5 max-w-lg mx-auto">
+      <button onclick="sendAllWhatsApp()" class="flex-1 bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 active:scale-95 text-white py-2 px-2 rounded-xl text-center flex flex-col items-center justify-center font-bold shadow-sm transition cursor-pointer">
+        <div class="flex items-center gap-1 text-xs">
+          <i class="fab fa-whatsapp text-sm"></i>
+          <span>ສົ່ງໃບບິນ</span>
+        </div>
+        <span class="text-[10px] text-emerald-200 font-normal font-mono" id="mob-cnt-unsent">0 ບິນ</span>
+      </button>
+
+      <button onclick="sendAllArrivalReminders()" class="flex-1 bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 active:scale-95 text-white py-2 px-2 rounded-xl text-center flex flex-col items-center justify-center font-bold shadow-sm transition cursor-pointer">
+        <div class="flex items-center gap-1 text-xs">
+          <i class="fas fa-bell text-sm"></i>
+          <span>ເຕືອນປາຍທາງ</span>
+        </div>
+        <span class="text-[10px] text-amber-200 font-normal font-mono" id="mob-cnt-dest">0 ບິນ</span>
+      </button>
+
+      <button onclick="triggerSync()" class="bg-slate-800 hover:bg-slate-700 active:scale-95 text-slate-200 py-2 px-3 rounded-xl text-center flex flex-col items-center justify-center font-semibold border border-slate-700 transition cursor-pointer">
+        <i class="fas fa-sync-alt text-xs text-red-400"></i>
+        <span class="text-[10px] mt-0.5">Sync</span>
+      </button>
+
+      <button onclick="toggleMobileView()" id="btn-mob-toggle-view" class="bg-slate-800 hover:bg-slate-700 active:scale-95 text-slate-200 py-2 px-2.5 rounded-xl text-center flex flex-col items-center justify-center font-semibold border border-slate-700 transition cursor-pointer" title="ປ່ຽນມຸມມອງ ບັດ/ຕາຕະລາງ">
+        <i class="fas fa-table-list text-xs text-blue-400" id="mob-view-icon"></i>
+        <span class="text-[10px] mt-0.5" id="mob-view-text">ຕາຕະລາງ</span>
+      </button>
+    </div>
+  </div>
+
+  <script>
+    let pollInterval = null;
+    let currentModalCarrier = 'anousith'; // 'anousith' or 'hal'
+
+    function openLoginModal(carrier = 'anousith') {
+      document.getElementById('login-modal').classList.remove('hidden');
+      switchModalCarrier(carrier);
+    }
+
+    function closeLoginModal() {
+      document.getElementById('login-modal').classList.add('hidden');
+    }
+
+    function formatLoginPhoneInput(input) {
+      let val = input.value.trim();
+      let digits = val.replace(/[^0-9]/g, '');
+
+      // Strip +856 or 856 if typed/pasted
+      if (digits.startsWith('856')) {
+        digits = digits.substring(3);
+      }
+      if (digits.startsWith('020')) {
+        digits = '20' + digits.substring(3);
+      } else if (digits.startsWith('030')) {
+        digits = '30' + digits.substring(3);
+      } else if (digits.startsWith('0')) {
+        digits = digits.substring(1);
+      }
+
+      input.value = digits;
+
+      // Update Live Preview
+      const preview = document.getElementById('phone-live-preview');
+      if (digits.length >= 2) {
+        preview.textContent = '+856' + digits;
+        preview.className = 'font-mono text-emerald-700 font-black';
+      } else {
+        preview.textContent = '+85620XXXXXXXX';
+        preview.className = 'font-mono text-amber-700 font-bold';
+      }
+    }
+
+    function switchModalCarrier(carrier) {
+      currentModalCarrier = carrier;
+      const header = document.getElementById('login-modal-header');
+      const title = document.getElementById('login-modal-title');
+      const subtitle = document.getElementById('login-modal-subtitle');
+      const icon = document.getElementById('login-modal-icon');
+      const btnAnousith = document.getElementById('modal-carrier-anousith');
+      const btnHal = document.getElementById('modal-carrier-hal');
+      const lblPhone = document.getElementById('lbl-login-phone');
+      const lblPass = document.getElementById('lbl-login-password');
+      const btnSubmit = document.getElementById('btn-login-submit');
+      const phoneWrapper = document.getElementById('phone-input-wrapper');
+      const phoneInput = document.getElementById('login-phone');
+      const passInput = document.getElementById('login-password');
+      const shopInput = document.getElementById('login-shopname');
+      const tabLoginIcon = document.getElementById('tab-login-icon');
+      const feedback = document.getElementById('login-feedback');
+      const hintBox = document.getElementById('phone-format-hint');
+      const hintIcon = document.getElementById('phone-hint-icon');
+      const hintExample = document.getElementById('phone-format-example');
+      const hintDesc = document.getElementById('phone-format-desc');
+      feedback.className = 'hidden text-xs p-3 rounded-xl';
+
+      if (carrier === 'hal') {
+        header.className = 'bg-gradient-to-r from-amber-500 to-amber-600 px-6 py-4 flex items-center justify-between text-white transition-colors duration-300';
+        title.textContent = 'ຈັດການບັນຊີ HAL Express (ຮຸ່ງອາລຸນ)';
+        subtitle.textContent = 'ເຂົ້າສູ່ລະບົບບັນຊີລູກຄ້າ / ຮ້ານຄ້າ HAL Express';
+        subtitle.className = 'text-[11px] text-amber-100';
+        icon.innerHTML = '<i class="fas fa-bolt"></i>';
+
+        btnAnousith.className = 'py-2 rounded-xl text-xs font-semibold transition flex items-center justify-center gap-1.5 text-slate-600 hover:text-slate-900';
+        btnHal.className = 'py-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 bg-white text-amber-600 shadow-xs';
+
+        hintBox.className = 'flex items-start gap-2.5 p-3 rounded-2xl text-xs bg-amber-50 text-amber-900 border border-amber-200 transition-colors';
+        hintIcon.className = 'w-6 h-6 rounded-lg bg-amber-500/20 text-amber-700 flex items-center justify-center flex-shrink-0 mt-0.5 font-bold';
+        hintExample.className = 'font-mono text-amber-950 font-black bg-amber-200/80 px-2 py-0.5 rounded-lg text-[11px]';
+        hintExample.textContent = '+85620XXXXXXXX';
+        hintDesc.innerHTML = 'ບັງຄັບຮູບແບບສາກົນ: <strong>+85620...</strong> (ລະບົບລັອກ <strong>+856</strong> ໃຫ້ແລ້ວ ພິມພຽງ 20... / 020...)';
+
+        lblPhone.innerHTML = '<i class="fas fa-phone mr-1 text-slate-400"></i> ເບີໂທລະສັບ HAL Express *';
+        lblPass.innerHTML = '<i class="fas fa-lock mr-1 text-slate-400"></i> ລະຫັດຜ່ານ HAL Express *';
+        btnSubmit.className = 'w-full bg-amber-500 hover:bg-amber-600 text-white font-bold py-2.5 px-4 rounded-xl text-xs flex items-center justify-center gap-2 shadow-sm transition';
+        btnSubmit.innerHTML = '<i class="fas fa-right-to-bracket"></i> ເຂົ້າສູ່ລະບົບ HAL Express';
+        phoneWrapper.className = 'flex items-center rounded-xl border border-slate-300 focus-within:ring-2 focus-within:ring-amber-500 overflow-hidden bg-slate-50 transition shadow-inner';
+        phoneInput.placeholder = '2028372583 ຫຼື 020...';
+        passInput.className = 'w-full text-xs font-medium px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-amber-500 transition';
+        shopInput.className = 'w-full text-xs font-medium px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-amber-500 transition';
+        tabLoginIcon.className = 'fas fa-key mr-1 text-amber-500';
+      } else {
+        header.className = 'bg-gradient-to-r from-red-600 to-red-700 px-6 py-4 flex items-center justify-between text-white transition-colors duration-300';
+        title.textContent = 'ຈັດການບັນຊີ Anousith Express';
+        subtitle.textContent = 'ເຂົ້າສູ່ລະບົບເພື່ອໃຫ້ຄົນອື່ນ / ຮ້ານອື່ນໃຊ້ງານໄດ້';
+        subtitle.className = 'text-[11px] text-red-100';
+        icon.innerHTML = '<i class="fas fa-store"></i>';
+
+        btnAnousith.className = 'py-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 bg-white text-red-600 shadow-xs';
+        btnHal.className = 'py-2 rounded-xl text-xs font-semibold transition flex items-center justify-center gap-1.5 text-slate-600 hover:text-slate-900';
+
+        hintBox.className = 'flex items-start gap-2.5 p-3 rounded-2xl text-xs bg-red-50 text-red-900 border border-red-200 transition-colors';
+        hintIcon.className = 'w-6 h-6 rounded-lg bg-red-500/20 text-red-700 flex items-center justify-center flex-shrink-0 mt-0.5 font-bold';
+        hintExample.className = 'font-mono text-red-950 font-black bg-red-200/80 px-2 py-0.5 rounded-lg text-[11px]';
+        hintExample.textContent = '020XXXXXXXX ຫຼື +85620XXXXXXXX';
+        hintDesc.innerHTML = 'ຮອງຮັບທັງແບບ <strong>+85620...</strong> ຫຼື <strong>020...</strong> (ລະບົບຈະຈັດຮູບແບບໃຫ້ອັດຕະໂນມັດ)';
+
+        lblPhone.innerHTML = '<i class="fas fa-phone mr-1 text-slate-400"></i> ເບີໂທລະສັບ Anousith *';
+        lblPass.innerHTML = '<i class="fas fa-lock mr-1 text-slate-400"></i> ລະຫັດຜ່ານ Anousith *';
+        btnSubmit.className = 'w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2.5 px-4 rounded-xl text-xs flex items-center justify-center gap-2 shadow-sm transition';
+        btnSubmit.innerHTML = '<i class="fas fa-right-to-bracket"></i> ເຂົ້າສູ່ລະບົບ Anousith';
+        phoneWrapper.className = 'flex items-center rounded-xl border border-slate-300 focus-within:ring-2 focus-within:ring-red-500 overflow-hidden bg-slate-50 transition shadow-inner';
+        phoneInput.placeholder = '2028372583 ຫຼື 020...';
+        passInput.className = 'w-full text-xs font-medium px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500 transition';
+        shopInput.className = 'w-full text-xs font-medium px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500 transition';
+        tabLoginIcon.className = 'fas fa-key mr-1 text-red-500';
+      }
+
+      loadCarrierAccounts();
+      phoneInput.focus();
+    }
+
+    function switchLoginTab(tab) {
+      const form = document.getElementById('carrier-login-form');
+      const saved = document.getElementById('saved-accounts-container');
+      const btnNew = document.getElementById('tab-login-new');
+      const btnSaved = document.getElementById('tab-saved-accounts');
+
+      if (tab === 'login') {
+        form.classList.remove('hidden');
+        saved.classList.add('hidden');
+        btnNew.className = 'flex-1 py-1.5 rounded-lg text-xs font-bold bg-white text-slate-900 shadow-sm transition';
+        btnSaved.className = 'flex-1 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 transition';
+      } else {
+        form.classList.add('hidden');
+        saved.classList.remove('hidden');
+        btnSaved.className = 'flex-1 py-1.5 rounded-lg text-xs font-bold bg-white text-slate-900 shadow-sm transition';
+        btnNew.className = 'flex-1 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 transition';
+        loadCarrierAccounts();
+      }
+    }
+
+    async function loadCarrierAccounts() {
+      const isHal = currentModalCarrier === 'hal';
+      const url = isHal ? '/api/hal/accounts' : '/api/anousith/accounts';
+      try {
+        const res = await fetch(url);
+        const data = await res.json();
+        const accounts = data.accounts || [];
+        const active = isHal ? data.activeHalAccount : data.activeAccount;
+
+        document.getElementById('saved-count').textContent = accounts.length;
+
+        const listDiv = document.getElementById('saved-accounts-list');
+        if (accounts.length === 0) {
+          listDiv.innerHTML = `<div class="text-center py-6 text-slate-400 text-xs"><i class="fas fa-user-slash text-xl mb-1 block"></i>ບໍ່ທັນມີບັນຊີ ${isHal ? 'HAL' : 'Anousith'} ທີ່ບັນທຶກໄວ້</div>`;
+          return;
+        }
+
+        listDiv.innerHTML = accounts.map(acc => {
+          const isActive = active && active.phone === acc.phone;
+          const themeBg = isHal ? (isActive ? 'bg-amber-50/70 border-amber-200' : 'bg-white border-slate-200') : (isActive ? 'bg-red-50/70 border-red-200' : 'bg-white border-slate-200');
+          const avatarBg = isHal ? (isActive ? 'bg-amber-500 text-white' : 'bg-slate-100 text-slate-700') : (isActive ? 'bg-red-600 text-white' : 'bg-slate-100 text-slate-700');
+          const badgeBg = isHal ? 'bg-amber-500' : 'bg-red-600';
+          const switchBtnBg = isHal ? 'bg-amber-500 hover:bg-amber-600' : 'bg-red-600 hover:bg-red-700';
+
+          return `
+            <div class="p-3 rounded-2xl border ${themeBg} flex items-center justify-between gap-2 shadow-sm">
+              <div class="flex items-center gap-2.5 min-w-0">
+                <div class="w-8 h-8 rounded-full ${avatarBg} flex items-center justify-center font-bold text-xs flex-shrink-0">
+                  <i class="fas ${isHal ? 'fa-bolt' : 'fa-store'}"></i>
+                </div>
+                <div class="min-w-0">
+                  <div class="font-bold text-slate-800 text-xs truncate flex items-center gap-1.5">
+                    ${acc.shopName || acc.name || acc.phone}
+                    ${isActive ? `<span class="${badgeBg} text-white text-[9px] px-1.5 py-0.5 rounded-full font-semibold">ໃຊ້ຢູ່</span>` : ''}
+                  </div>
+                  <div class="text-[10px] text-slate-500 font-mono">${acc.phone}</div>
+                </div>
+              </div>
+              <div class="flex items-center gap-1">
+                ${!isActive ? `
+                  <button onclick="switchCarrierAccount('${acc.phone}')" class="px-2.5 py-1 text-[11px] font-semibold ${switchBtnBg} text-white rounded-lg transition shadow-sm">
+                    ເລືອກໃຊ້
+                  </button>
+                ` : ''}
+                <button onclick="deleteCarrierAccount('${acc.phone}')" class="p-1.5 text-slate-400 hover:text-rose-600 transition text-xs" title="ລຶບບັນຊີ">
+                  <i class="fas fa-trash-alt"></i>
+                </button>
+              </div>
+            </div>
+          `;
+        }).join('');
+      } catch (err) {
+        console.error('Error loading carrier accounts:', err);
+      }
+    }
+
+    async function handleCarrierLogin(e) {
+      e.preventDefault();
+      const isHal = currentModalCarrier === 'hal';
+      const rawInput = document.getElementById('login-phone').value.trim();
+      const password = document.getElementById('login-password').value;
+      const shopName = document.getElementById('login-shopname').value.trim();
+      const feedback = document.getElementById('login-feedback');
+      const btn = document.getElementById('btn-login-submit');
+
+      // Extract cleaned digits
+      let digits = rawInput.replace(/[^0-9]/g, '');
+      if (digits.startsWith('856')) digits = digits.substring(3);
+      if (digits.startsWith('020')) digits = '20' + digits.substring(3);
+      else if (digits.startsWith('030')) digits = '30' + digits.substring(3);
+      else if (digits.startsWith('0')) digits = digits.substring(1);
+
+      if (digits.length < 8) {
+        feedback.className = 'block text-xs p-3 rounded-xl bg-rose-50 text-rose-800 border border-rose-200';
+        feedback.innerHTML = `⚠️ ກະລຸນາປ້ອນເບີໂທໃຫ້ຄົບຖ້ວນ (ຕົວຢ່າງ: 2028372583 ຫຼື 02028372583)`;
+        return;
+      }
+
+      const fullPhone = '+856' + digits;
+
+      btn.disabled = true;
+      btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> ກຳລັງກວດສອບ...`;
+      feedback.className = 'hidden text-xs p-3 rounded-xl';
+
+      const loginUrl = isHal ? '/api/hal/login' : '/api/anousith/login';
+
+      try {
+        const res = await fetch(loginUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ phone: fullPhone, password, shopName })
+        });
+        const data = await res.json();
+
+        if (data.success) {
+          feedback.className = 'block text-xs p-3 rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-200';
+          feedback.innerHTML = `✅ ${data.message || 'ເຂົ້າສູ່ລະບົບສຳເລັດແລ້ວ'}`;
+          document.getElementById('login-phone').value = '';
+          document.getElementById('login-password').value = '';
+          document.getElementById('login-shopname').value = '';
+          setTimeout(() => {
+            closeLoginModal();
+            checkStatus();
+            loadCarrierAccounts();
+          }, 800);
+        } else {
+          feedback.className = 'block text-xs p-3 rounded-xl bg-rose-50 text-rose-800 border border-rose-200';
+          feedback.innerHTML = `❌ ${data.error || 'ເຂົ້າສູ່ລະບົບບໍ່ສຳເລັດ'}`;
+        }
+      } catch (err) {
+        feedback.className = 'block text-xs p-3 rounded-xl bg-rose-50 text-rose-800 border border-rose-200';
+        feedback.innerHTML = `❌ ຜິດພາດ: ${err.message}`;
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = `<i class="fas fa-right-to-bracket"></i> ${isHal ? 'ເຂົ້າສູ່ລະບົບ HAL Express' : 'ເຂົ້າສູ່ລະບົບ Anousith'}`;
+      }
+    }
+
+    async function switchCarrierAccount(phone) {
+      const isHal = currentModalCarrier === 'hal';
+      const url = isHal ? '/api/hal/switch-account' : '/api/anousith/switch-account';
+      try {
+        const res = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ phone })
+        });
+        const data = await res.json();
+        if (data.success) {
+          alert('✅ ' + data.message);
+          checkStatus();
+          loadCarrierAccounts();
+        } else {
+          alert('❌ ຜິດພາດ: ' + data.error);
+        }
+      } catch (err) {
+        alert('❌ ຜິດພາດ: ' + err.message);
+      }
+    }
+
+    async function deleteCarrierAccount(phone) {
+      const isHal = currentModalCarrier === 'hal';
+      if (!confirm(`ຢືນຢັນການລຶບບັນຊີ ${phone}?`)) return;
+      const url = isHal ? '/api/hal/logout' : '/api/anousith/logout';
+      try {
+        const res = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ phone })
+        });
+        const data = await res.json();
+        if (data.success) {
+          checkStatus();
+          loadCarrierAccounts();
+        }
+      } catch (err) {
+        alert('❌ ຜິດພາດ: ' + err.message);
+      }
+    }
+
+    async function checkStatus() {
+      try {
+        const res = await fetch('/api/status');
+        const data = await res.json();
+        
+        const statusDot = document.getElementById('status-dot');
+        const statusText = document.getElementById('status-text');
+        const qrContainer = document.getElementById('qr-container');
+        const connectedBox = document.getElementById('connected-box');
+        const qrImg = document.getElementById('qr-img');
+        const qrLoading = document.getElementById('qr-loading');
+
+        // Update active Anousith merchant profile
+        if (data.activeAccount) {
+          document.getElementById('anousith-user-name').textContent = data.activeAccount.shopName || data.activeAccount.name || 'ຮ້ານຄ້າ Anousith';
+          document.getElementById('anousith-user-phone').textContent = data.activeAccount.phone || '-';
+        } else if (data.anousithUser) {
+          document.getElementById('anousith-user-name').textContent = 'Savage shop';
+          document.getElementById('anousith-user-phone').textContent = data.anousithUser;
+        } else {
+          document.getElementById('anousith-user-name').textContent = 'ເຂົ້າສູ່ລະບົບ';
+          document.getElementById('anousith-user-phone').textContent = 'Anousith Express';
+        }
+
+        // Update active HAL Express merchant profile
+        if (data.activeHalAccount) {
+          document.getElementById('hal-user-name').textContent = data.activeHalAccount.shopName || data.activeHalAccount.name || 'ຮ້ານຄ້າ HAL';
+          document.getElementById('hal-user-phone').textContent = data.activeHalAccount.phone || '-';
+        } else {
+          document.getElementById('hal-user-name').textContent = 'ເຂົ້າສູ່ລະບົບ HAL';
+          document.getElementById('hal-user-phone').textContent = 'HAL Express';
+        }
+
+        if (data.connected) {
+          statusDot.className = 'w-2.5 h-2.5 rounded-full bg-emerald-400';
+          statusText.textContent = 'WhatsApp ເຊື່ອມຕໍ່ແລ້ວ';
+          qrContainer.classList.add('hidden');
+          connectedBox.classList.remove('hidden');
+        } else {
+          statusDot.className = 'w-2.5 h-2.5 rounded-full bg-yellow-400 animate-pulse';
+          statusText.textContent = 'ລໍຖ້າສະແກນ QR Code';
+          qrContainer.classList.remove('hidden');
+          connectedBox.classList.add('hidden');
+
+          if (data.qrDataUrl) {
+            qrImg.src = data.qrDataUrl;
+            qrImg.classList.remove('hidden');
+            qrLoading.classList.add('hidden');
+          } else {
+            qrImg.classList.add('hidden');
+            qrLoading.classList.remove('hidden');
+          }
+        }
+      } catch (err) {
+        console.error('Error checking status:', err);
+      }
+    }
+
+    let cachedBills = [];
+    let currentCarrierFilter = 'all';
+    let currentStatusFilter = 'all';
+    let currentRemindFilter = 'all';
+    let searchQuery = '';
+    let datePreset = 'all';
+    let customDateFrom = '';
+    let customDateTo = '';
+
+    // Hidden Bills persistence
+    let hiddenBills = JSON.parse(localStorage.getItem('hiddenBills') || '[]');
+    let hiddenBillsSet = new Set(hiddenBills);
+
+    function hideBill(tracking) {
+      hiddenBillsSet.add(tracking);
+      localStorage.setItem('hiddenBills', JSON.stringify(Array.from(hiddenBillsSet)));
+      updateDashboardStats();
+      renderFilteredBills();
+      showQuickToast('ຊ່ອນບິນ #' + tracking + ' ແລ້ວ (ກົດ "ບິນທີ່ຊ່ອນ" ເພື່ອເບິ່ງຄືນ)');
+    }
+
+    function unhideBill(tracking) {
+      hiddenBillsSet.delete(tracking);
+      localStorage.setItem('hiddenBills', JSON.stringify(Array.from(hiddenBillsSet)));
+      updateDashboardStats();
+      renderFilteredBills();
+      showQuickToast('ສະແດງບິນ #' + tracking + ' ຄືນແລ້ວ');
+    }
+
+    function unhideAllBills() {
+      if (hiddenBillsSet.size === 0) return;
+      if (!confirm('ທ່ານຕ້ອງການສະແດງທຸກບິນທີ່ຊ່ອນໄວ້ຄືນທັງໝົດແທ້ບໍ?')) return;
+      hiddenBillsSet.clear();
+      localStorage.setItem('hiddenBills', JSON.stringify([]));
+      updateDashboardStats();
+      renderFilteredBills();
+      showQuickToast('ສະແດງທຸກບິນຄືນຮຽບຮ້ອຍແລ້ວ!');
+    }
+
+    function hideAllDelivered() {
+      hideAllDeliveredBills();
+    }
+    function hideAllDeliveredBills() {
+      let count = 0;
+      cachedBills.forEach(([tracking, item]) => {
+        const st = item.shippingStatus || '';
+        if (st.includes('ສຳເລັດ') || st.includes('ຮັບເຄື່ອງ')) {
+          hiddenBillsSet.add(tracking);
+          count++;
+        }
+      });
+      if (count === 0) {
+        alert('ບໍ່ມີບິນທີ່ຮັບເຄື່ອງແລ້ວໃຫ້ຊ່ອນ');
+        return;
+      }
+      localStorage.setItem('hiddenBills', JSON.stringify(Array.from(hiddenBillsSet)));
+      updateDashboardStats();
+      renderFilteredBills();
+      showQuickToast('ຊ່ອນບິນທີ່ຮັບເຄື່ອງແລ້ວ ' + count + ' ບິນ!');
+    }
+
+    // Mobile / Desktop View Mode ('cards' or 'table')
+    let currentViewMode = localStorage.getItem('viewMode') || (window.innerWidth < 768 ? 'cards' : 'table');
+
+    function normalizeDateStr(val, fallback) {
+      if (!val && fallback) return fallback.split('T')[0];
+      if (!val) return '';
+      const s = String(val).trim();
+      if (s.includes('T')) return s.split('T')[0];
+      if (s.match(/^\d{4}-\d{2}-\d{2}$/)) return s;
+      const parts = s.split(/[\/\-\.]/);
+      if (parts.length === 3) {
+        if (parts[0].length === 4) return `${parts[0]}-${parts[1].padStart(2, '0')}-${parts[2].padStart(2, '0')}`;
+        if (parts[2].length === 4) return `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
+      }
+      return s;
+    }
+
+    function checkItemMatchesDate(item) {
+      if (!customDateFrom && !customDateTo) return true;
+      const dStr = normalizeDateStr(item.dateDeposited, item.sent_at);
+      if (!dStr) return true;
+
+      if (customDateFrom && dStr < customDateFrom) return false;
+      if (customDateTo && dStr > customDateTo) return false;
+      return true;
+    }
+
+    function syncDateControls() {
+      const f = customDateFrom || '';
+      const t = customDateTo || '';
+      if (document.getElementById('date-filter-from')) document.getElementById('date-filter-from').value = f;
+      if (document.getElementById('date-filter-to')) document.getElementById('date-filter-to').value = t;
+      if (document.getElementById('top-date-from')) document.getElementById('top-date-from').value = f;
+      if (document.getElementById('top-date-to')) document.getElementById('top-date-to').value = t;
+
+      ['all', 'today', '7days', '30days'].forEach(id => {
+        const isAct = id === datePreset;
+        const btnBottom = document.getElementById(`date-btn-${id}`);
+        const btnTop = document.getElementById(`top-date-btn-${id}`);
+
+        if (btnBottom) {
+          btnBottom.className = isAct
+            ? 'px-2.5 py-1 rounded-lg font-bold bg-white border border-slate-300 text-slate-900 shadow-xs transition'
+            : 'px-2.5 py-1 rounded-lg font-medium text-slate-600 hover:bg-white transition';
+        }
+        if (btnTop) {
+          btnTop.className = isAct
+            ? 'px-2.5 py-1 rounded-lg font-bold bg-white text-slate-900 shadow-xs transition'
+            : 'px-2.5 py-1 rounded-lg font-semibold text-slate-600 hover:text-slate-900 transition';
+        }
+      });
+    }
+
+    function setDatePreset(preset) {
+      datePreset = preset;
+      const now = new Date();
+      const toDateStr = now.toISOString().split('T')[0];
+
+      if (preset === 'all') {
+        customDateFrom = '';
+        customDateTo = '';
+      } else if (preset === 'today') {
+        customDateFrom = toDateStr;
+        customDateTo = toDateStr;
+      } else if (preset === '7days') {
+        const d7 = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+        customDateFrom = d7.toISOString().split('T')[0];
+        customDateTo = toDateStr;
+      } else if (preset === '30days') {
+        const d30 = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+        customDateFrom = d30.toISOString().split('T')[0];
+        customDateTo = toDateStr;
+      }
+
+      syncDateControls();
+      loadBills();
+    }
+
+    function applyCustomDateRange() {
+      datePreset = 'custom';
+      customDateFrom = document.getElementById('date-filter-from')?.value || '';
+      customDateTo = document.getElementById('date-filter-to')?.value || '';
+      syncDateControls();
+      loadBills();
+    }
+
+    function applyTopCustomDate() {
+      datePreset = 'custom';
+      customDateFrom = document.getElementById('top-date-from')?.value || '';
+      customDateTo = document.getElementById('top-date-to')?.value || '';
+      syncDateControls();
+      loadBills();
+    }
+
+    function filterStatus(status) {
+      currentStatusFilter = status;
+      currentRemindFilter = 'all';
+
+      // Update Row 2 status filter buttons
+      const fltIds = ['all', 'unsent', 'transit', 'dest', 'remind0', 'remind1', 'remind2', 'remind3plus', 'done', 'ret', 'failed', 'hidden'];
+      fltIds.forEach(id => {
+        const btn = document.getElementById(`flt-${id}`);
+        if (btn) {
+          if (id === status) {
+            btn.classList.add('ring-2', 'ring-red-500', 'ring-offset-1', 'font-black');
+          } else {
+            btn.classList.remove('ring-2', 'ring-red-500', 'ring-offset-1', 'font-black');
+          }
+        }
+      });
+
+      // Update color legend buttons
+      const legendBtns = document.querySelectorAll('#color-legend-buttons button, #top-status-filter-buttons button');
+      legendBtns.forEach(btn => {
+        const onclickAttr = btn.getAttribute('onclick') || '';
+        if (onclickAttr.includes(`'${status}'`)) {
+          btn.classList.add('ring-2', 'ring-red-500', 'ring-offset-1', 'font-black');
+        } else if (onclickAttr.includes('filterStatus')) {
+          btn.classList.remove('ring-2', 'ring-red-500', 'ring-offset-1', 'font-black');
+        }
+      });
+
+      renderFilteredBills();
+    }
+
+    function filterCarrier(carrier) {
+      currentCarrierFilter = carrier;
+
+      ['all', 'anousith', 'hal'].forEach(c => {
+        const isSelected = (c === 'all' && carrier === 'all') ||
+                           (c === 'anousith' && carrier === 'Anousith Express') ||
+                           (c === 'hal' && carrier === 'HAL Express');
+
+        const btn = document.getElementById(`carrier-btn-${c}`);
+        if (btn) {
+          if (isSelected) {
+            btn.className = c === 'all'
+              ? 'px-3 py-1.5 rounded-xl font-bold bg-white text-slate-900 shadow-sm border border-slate-300 transition'
+              : c === 'anousith'
+                ? 'px-3 py-1.5 rounded-xl font-bold bg-red-600 text-white shadow-sm border border-red-700 transition'
+                : 'px-3 py-1.5 rounded-xl font-bold bg-amber-500 text-slate-950 shadow-sm border border-amber-600 transition';
+          } else {
+            btn.className = 'px-3 py-1.5 rounded-xl font-medium text-slate-600 hover:text-slate-900 transition';
+          }
+        }
+
+        const fltBtn = document.getElementById(`carrier-flt-${c}`);
+        if (fltBtn) {
+          if (isSelected) {
+            fltBtn.className = 'px-2.5 py-1 rounded-lg font-bold bg-slate-900 text-white shadow-xs transition flex-shrink-0 cursor-pointer';
+          } else {
+            fltBtn.className = 'px-2.5 py-1 rounded-lg font-medium text-slate-600 hover:bg-slate-100 transition flex items-center gap-1 flex-shrink-0 cursor-pointer';
+          }
+        }
+      });
+
+      const btnAll = document.getElementById('btn-send-all');
+      const btnRemind = document.getElementById('btn-remind-all');
+      const btnReturned = document.getElementById('btn-returned-all');
+      const btnMarkAll = document.getElementById('btn-mark-all-sent');
+      const btnMarkRemind = document.getElementById('btn-mark-all-reminders');
+
+      const carrierLabel = carrier === 'all' ? 'ທຸກຂົນສົ່ງ' : carrier;
+      if (btnAll) btnAll.innerHTML = `<i class="fab fa-whatsapp text-sm"></i> ສົ່ງ WhatsApp ທັງໝົດ (${carrierLabel}) <span id="btn-cnt-unsent" class="bg-red-500 text-white text-[10px] px-1.5 py-0.5 rounded-full ml-1">0</span>`;
+      if (btnRemind) btnRemind.innerHTML = `<i class="fas fa-bell text-xs"></i> ສົ່ງເຕືອນປາຍທາງທັງໝົດ (${carrierLabel}) <span id="btn-cnt-dest" class="bg-amber-400 text-slate-950 text-[10px] px-1.5 py-0.5 rounded-full ml-1 font-bold">0</span>`;
+      if (btnReturned) btnReturned.innerHTML = `<i class="fas fa-undo-alt text-xs"></i> ສົ່ງເຕືອນຕີກັບ x2 (${carrierLabel}) <span id="btn-cnt-ret" class="bg-rose-500 text-white text-[10px] px-1.5 py-0.5 rounded-full ml-1 font-bold">0</span>`;
+      if (btnMarkAll) btnMarkAll.innerHTML = `<i class="fas fa-check-double text-xs"></i> ໝາຍວ່າສົ່ງແລ້ວທັງໝົດ (${carrierLabel})`;
+      if (btnMarkRemind) btnMarkRemind.innerHTML = `<i class="fas fa-check text-xs"></i> ໝາຍວ່າເຕືອນປາຍທາງແລ້ວທັງໝົດ (${carrierLabel})`;
+
+      updateDashboardStats();
+      renderFilteredBills();
+    }
+
+    function filterReminderFrequency(remindLevel) {
+      currentRemindFilter = remindLevel;
+      currentStatusFilter = 'ຮອດປາຍທາງ';
+
+      ['all', '0', '1', '2', '3plus'].forEach(lvl => {
+        const card = document.getElementById(`kpi-remind-${lvl}`);
+        if (card) {
+          if (lvl === remindLevel) {
+            card.classList.add('ring-2', 'ring-red-500', 'ring-offset-1', 'bg-white', 'shadow-md');
+          } else {
+            card.classList.remove('ring-2', 'ring-red-500', 'ring-offset-1', 'shadow-md');
+          }
+        }
+      });
+
+      renderFilteredBills();
+    }
+
+    function searchBills() {
+      searchQuery = (document.getElementById('table-search-input')?.value || document.getElementById('search-input')?.value || '').trim();
+      renderFilteredBills();
+    }
+
+    function switchViewMode(mode) {
+      currentViewMode = mode;
+      localStorage.setItem('viewMode', mode);
+
+      const tableContainer = document.getElementById('bills-table-container');
+      const cardsContainer = document.getElementById('bills-cards-container');
+      const btnCards = document.getElementById('btn-view-cards');
+      const btnTable = document.getElementById('btn-view-table');
+
+      if (mode === 'cards') {
+        if (tableContainer) tableContainer.classList.add('hidden');
+        if (cardsContainer) cardsContainer.classList.remove('hidden');
+        if (btnCards) {
+          btnCards.className = 'px-3 py-1.5 rounded-lg font-bold bg-white text-slate-900 shadow-sm transition flex items-center gap-1.5 cursor-pointer';
+        }
+        if (btnTable) {
+          btnTable.className = 'px-3 py-1.5 rounded-lg font-medium text-slate-600 hover:text-slate-900 transition flex items-center gap-1.5 cursor-pointer';
+        }
+      } else {
+        if (tableContainer) tableContainer.classList.remove('hidden');
+        if (cardsContainer) cardsContainer.classList.add('hidden');
+        if (btnTable) {
+          btnTable.className = 'px-3 py-1.5 rounded-lg font-bold bg-white text-slate-900 shadow-sm transition flex items-center gap-1.5 cursor-pointer';
+        }
+        if (btnCards) {
+          btnCards.className = 'px-3 py-1.5 rounded-lg font-medium text-slate-600 hover:text-slate-900 transition flex items-center gap-1.5 cursor-pointer';
+        }
+      }
+    }
+
+    function toggleMobileView() {
+      switchViewMode(currentViewMode === 'cards' ? 'table' : 'cards');
+    }
+
+    function copyToClipboard(text, msg) {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(() => {
+          showQuickToast(msg || `ກັອບປີ້ "${text}" ແລ້ວ!`);
+        }).catch(() => {
+          fallbackCopyText(text, msg);
+        });
+      } else {
+        fallbackCopyText(text, msg);
+      }
+    }
+
+    function fallbackCopyText(text, msg) {
+      const textArea = document.createElement('textarea');
+      textArea.value = text;
+      textArea.style.position = 'fixed';
+      textArea.style.left = '-999999px';
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+      try {
+        document.execCommand('copy');
+        showQuickToast(msg || `ກັອບປີ້ "${text}" ແລ້ວ!`);
+      } catch (err) {
+        alert('ບໍ່ສາມາດກັອບປີ້ໄດ້: ' + text);
+      }
+      document.body.removeChild(textArea);
+    }
+
+    function showQuickToast(msg) {
+      const existing = document.getElementById('quick-copy-toast');
+      if (existing) existing.remove();
+
+      const toast = document.createElement('div');
+      toast.id = 'quick-copy-toast';
+      toast.className = 'fixed bottom-20 left-1/2 -translate-x-1/2 z-50 bg-slate-900 text-white text-xs font-semibold px-4 py-2.5 rounded-full shadow-2xl flex items-center gap-2 border border-slate-700 animate-fade-in';
+      toast.innerHTML = `<i class="fas fa-check-circle text-emerald-400"></i> ${msg}`;
+      document.body.appendChild(toast);
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transition = 'opacity 0.3s ease';
+        setTimeout(() => toast.remove(), 300);
+      }, 2000);
+    }
+
+    function renderFilteredBills() {
+      let filtered = cachedBills;
+
+      // 1. Date filter
+      filtered = filtered.filter(([tracking, item]) => checkItemMatchesDate(item));
+
+      // 2. Carrier filter
+      if (currentCarrierFilter !== 'all') {
+        filtered = filtered.filter(([tracking, item]) => {
+          const carrier = item.carrier || (tracking.startsWith('HAL') || tracking.startsWith('HA') ? 'HAL Express' : 'Anousith Express');
+          return carrier.toLowerCase().includes(currentCarrierFilter.toLowerCase());
+        });
+      }
+
+      // 3. Status & Hidden filter
+      if (currentStatusFilter === 'hidden') {
+        filtered = filtered.filter(([tracking]) => hiddenBillsSet.has(tracking));
+      } else {
+        // Exclude hidden bills from regular views
+        filtered = filtered.filter(([tracking]) => !hiddenBillsSet.has(tracking));
+
+        if (currentStatusFilter === 'unsent') {
+          filtered = filtered.filter(([tracking, item]) => !item.sent_to_whatsapp && item.send_status !== 'failed' && !item.last_error && !item.no_whatsapp);
+        } else if (currentStatusFilter === 'failed' || currentStatusFilter === 'ສົ່ງບໍ່ໄດ້') {
+          filtered = filtered.filter(([tracking, item]) => item.send_status === 'failed' || !!item.last_error || !!item.no_whatsapp);
+        } else if (currentStatusFilter === 'transit' || currentStatusFilter === 'ກຳລັງສົ່ງ' || currentStatusFilter === 'ກຳລັງຂົນສົ່ງ') {
+          filtered = filtered.filter(([tracking, item]) => {
+            const st = item.shippingStatus || 'ກຳລັງຂົນສົ່ງ';
+            return !st.includes('ຕີກັບ') && !st.includes('ສຳເລັດ') && !st.includes('ຮັບເຄື່ອງ') && !st.includes('ຮອດປາຍທາງ');
+          });
+        } else if (currentStatusFilter === 'dest' || currentStatusFilter === 'ຮອດປາຍທາງ' || currentStatusFilter === 'ປາຍທາງ') {
+          filtered = filtered.filter(([tracking, item]) => {
+            const st = item.shippingStatus || '';
+            return st.includes('ຮອດປາຍທາງ');
+          });
+        } else if (currentStatusFilter === 'done' || currentStatusFilter === 'ຮັບແລ້ວ' || currentStatusFilter === 'ສຳເລັດ') {
+          filtered = filtered.filter(([tracking, item]) => {
+            const st = item.shippingStatus || '';
+            return st.includes('ສຳເລັດ') || st.includes('ຮັບເຄື່ອງ');
+          });
+        } else if (currentStatusFilter === 'ret' || currentStatusFilter === 'ຕີກັບ') {
+          filtered = filtered.filter(([tracking, item]) => {
+            const st = item.shippingStatus || '';
+            return st.includes('ຕີກັບ');
+          });
+        } else if (currentStatusFilter === 'remind0' || currentStatusFilter === 'ຍັງບໍ່ເຕືອນ') {
+          filtered = filtered.filter(([tracking, item]) => {
+            const st = item.shippingStatus || '';
+            const rCount = item.reminder_count || (item.notified_arrival ? 1 : 0);
+            return st.includes('ຮອດປາຍທາງ') && rCount === 0;
+          });
+        } else if (currentStatusFilter === 'remind1' || currentStatusFilter === 'ເຕືອນຄັ້ງ 1') {
+          filtered = filtered.filter(([tracking, item]) => {
+            const st = item.shippingStatus || '';
+            const rCount = item.reminder_count || (item.notified_arrival ? 1 : 0);
+            return st.includes('ຮອດປາຍທາງ') && rCount === 1;
+          });
+        } else if (currentStatusFilter === 'remind2' || currentStatusFilter === 'ເຕືອນຄັ້ງ 2') {
+          filtered = filtered.filter(([tracking, item]) => {
+            const st = item.shippingStatus || '';
+            const rCount = item.reminder_count || (item.notified_arrival ? 1 : 0);
+            return st.includes('ຮອດປາຍທາງ') && rCount === 2;
+          });
+        } else if (currentStatusFilter === 'remind3plus' || currentStatusFilter === 'ເຕືອນ 3+' || currentStatusFilter === 'ເຕືອນ 3+ ຄັ້ງ') {
+          filtered = filtered.filter(([tracking, item]) => {
+            const st = item.shippingStatus || '';
+            const rCount = item.reminder_count || (item.notified_arrival ? 1 : 0);
+            return st.includes('ຮອດປາຍທາງ') && rCount >= 3;
+          });
+        } else if (currentStatusFilter !== 'all') {
+          filtered = filtered.filter(([tracking, item]) => {
+            const st = item.shippingStatus || 'ກຳລັງຂົນສົ່ງ';
+            return st.includes(currentStatusFilter);
+          });
+        }
+      }
+
+      // 4. Reminder frequency filter (from KPI cards)
+      if (currentRemindFilter !== 'all') {
+        filtered = filtered.filter(([tracking, item]) => {
+          const rCount = item.reminder_count || (item.notified_arrival ? 1 : 0);
+          if (currentRemindFilter === '0') return rCount === 0;
+          if (currentRemindFilter === '1') return rCount === 1;
+          if (currentRemindFilter === '2') return rCount === 2;
+          if (currentRemindFilter === '3plus') return rCount >= 3;
+          return true;
+        });
+      }
+
+      // 5. Search Query
+      const qInput = document.getElementById('table-search-input')?.value || document.getElementById('search-input')?.value || searchQuery || '';
+      const q = qInput.trim().toLowerCase();
+      if (q) {
+        filtered = filtered.filter(([tracking, item]) => {
+          return (
+            tracking.toLowerCase().includes(q) ||
+            (item.recipientName && item.recipientName.toLowerCase().includes(q)) ||
+            (item.recipientPhone && item.recipientPhone.includes(q)) ||
+            (item.destinationBranch && item.destinationBranch.toLowerCase().includes(q))
+          );
+        });
+      }
+
+      const tbody = document.getElementById('bills-table-body');
+      const cardsContainer = document.getElementById('bills-cards-container');
+
+      if (filtered.length === 0) {
+        if (tbody) tbody.innerHTML = `<tr><td colspan="12" class="py-8 text-center text-slate-400"><i class="fas fa-inbox text-2xl mb-2 block"></i>ບໍ່ພົບລາຍການທີ່ຕົງກັບເງື່ອນໄຂ</td></tr>`;
+        if (cardsContainer) cardsContainer.innerHTML = `<div class="col-span-full py-10 text-center text-slate-400 bg-slate-50/50 rounded-2xl border border-slate-200/80"><i class="fas fa-inbox text-3xl mb-2 block text-slate-300"></i><span class="text-xs font-medium">ບໍ່ພົບລາຍການທີ່ຕົງກັບເງື່ອນໄຂ</span></div>`;
+        return;
+      }
+
+      const tableRows = [];
+      const cardItems = [];
+
+      filtered.forEach(([tracking, item], idx) => {
+        const carrier = item.carrier || (tracking.startsWith('HAL') || tracking.startsWith('HA') ? 'HAL Express' : 'Anousith Express');
+        const isHAL = carrier.includes('HAL') || carrier.includes('ຮຸ່ງອາລຸນ');
+        const carrierBadge = isHAL
+          ? `<span class="bg-amber-100 text-amber-900 font-bold px-2.5 py-0.5 rounded-full text-[10px] inline-flex items-center gap-1 border border-amber-300 shadow-2xs"><i class="fas fa-bolt text-amber-600"></i> HAL</span>`
+          : `<span class="bg-red-100 text-red-800 font-bold px-2.5 py-0.5 rounded-full text-[10px] inline-flex items-center gap-1 border border-red-300 shadow-2xs"><i class="fas fa-cube text-red-600"></i> Anousith</span>`;
+
+        const shareUrl = item.billUrl || (isHAL
+          ? `https://halexpress.la/track?tracking=${tracking}`
+          : `https://app.anousith.express/landing/search_tracking/bill_share?tacking_number=${tracking}`);
+
+        const phone = item.recipientPhone || '-';
+        const name = item.recipientName || 'ລູກຄ້າ';
+        const branch = item.destinationBranch || '-';
+        const codExp = item.codExpected || '0 KIP';
+        const codCol = item.codCollected || '0 KIP';
+        const st = item.shippingStatus || 'ກຳລັງຂົນສົ່ງ';
+        const dateStr = item.dateDeposited || (item.sent_at ? item.sent_at.split('T')[0] : '-');
+
+        const isSendFailed = item.send_status === 'failed' || !!item.last_error || !!item.no_whatsapp;
+
+        // Clean, elegant row background with color accent border
+        let rowClass = 'bg-white hover:bg-slate-50 transition border-l-4 border-l-slate-300';
+        let cardBorder = 'border-slate-200 bg-white';
+        let statusBadge = `<span class="bg-blue-100 text-blue-800 border border-blue-200 font-bold px-2.5 py-1 rounded-full text-[11px] inline-flex items-center gap-1 shadow-2xs"><i class="fas fa-truck text-blue-600"></i> ${st}</span>`;
+        let arrivalBadge = `<span class="text-slate-300 text-xs">-</span>`;
+
+        if (st.includes('ຕີກັບ')) {
+          rowClass = 'bg-rose-50/40 hover:bg-rose-50/80 transition border-l-4 border-l-rose-500';
+          cardBorder = 'border-rose-300 bg-rose-50/30';
+          statusBadge = `<span class="bg-rose-100 text-rose-800 border border-rose-300 font-bold px-2.5 py-1 rounded-full text-[11px] inline-flex items-center gap-1 shadow-2xs"><i class="fas fa-undo-alt text-rose-600"></i> ຕີກັບ</span>`;
+          if (item.notified_returned) {
+            arrivalBadge = `<span class="bg-rose-100 text-rose-800 border border-rose-300 font-bold px-2.5 py-0.5 rounded-full text-[10px] inline-flex items-center gap-1 shadow-2xs"><i class="fas fa-check-circle text-rose-600"></i> ແຈ້ງຄ່າຝາກ x2 ແລ້ວ</span>`;
+          } else {
+            arrivalBadge = `<button onclick="sendReturnedNotification('${tracking}')" class="bg-rose-600 hover:bg-rose-700 text-white font-bold px-2.5 py-0.5 rounded-full text-[10px] inline-flex items-center gap-1 transition shadow-xs cursor-pointer hover:scale-105 active:scale-95"><i class="fas fa-undo-alt"></i> ແຈ້ງຄ່າຝາກ x2</button>`;
+          }
+        } else if (st.includes('ສຳເລັດ') || st.includes('ຮັບເຄື່ອງ')) {
+          rowClass = 'bg-emerald-50/30 hover:bg-emerald-50/70 transition border-l-4 border-l-emerald-500';
+          cardBorder = 'border-emerald-300 bg-emerald-50/30';
+          statusBadge = `<span class="bg-emerald-100 text-emerald-800 border border-emerald-300 font-bold px-2.5 py-1 rounded-full text-[11px] inline-flex items-center gap-1 shadow-2xs"><i class="fas fa-check-circle text-emerald-600"></i> ຮັບແລ້ວ</span>`;
+          arrivalBadge = `<span class="bg-emerald-100 text-emerald-800 border border-emerald-200 font-semibold px-2.5 py-0.5 rounded-full text-[10px] inline-flex items-center gap-1 shadow-2xs"><i class="fas fa-check text-emerald-600"></i> ລູກຄ້າຮັບແລ້ວ</span>`;
+        } else if (st.includes('ຮອດປາຍທາງ')) {
+          const rCount = item.reminder_count || (item.notified_arrival ? 1 : 0);
+          
+          let daysRemaining = 5;
+          if (item.dateDeposited) {
+            const depDate = new Date(item.dateDeposited);
+            if (!isNaN(depDate.getTime())) {
+              const daysPassed = Math.floor((Date.now() - depDate.getTime()) / (1000 * 60 * 60 * 24));
+              daysRemaining = Math.max(1, 7 - daysPassed);
+            }
+          }
+          const daysBadge = `<span class="text-[10px] text-rose-600 font-bold flex items-center gap-0.5"><i class="far fa-clock text-[9px]"></i> ເຫຼືອ ~ ${daysRemaining} ວັນ</span>`;
+
+          const lastRemindTime = item.last_reminded_at ? new Date(item.last_reminded_at).getTime() : 0;
+          const hoursPassed = lastRemindTime ? (Date.now() - lastRemindTime) / (1000 * 60 * 60) : 999;
+
+          let sendBtn = '';
+          if (lastRemindTime && hoursPassed < 48) {
+            const waitHours = Math.ceil(48 - hoursPassed);
+            sendBtn = `<span class="text-[9px] bg-slate-100 text-slate-600 font-semibold px-2 py-0.5 rounded-full inline-flex items-center gap-1 border border-slate-200"><i class="fas fa-lock text-[8px]"></i> ອີກ ${waitHours}h</span>`;
+          } else {
+            sendBtn = `<button onclick="sendArrivalReminder('${tracking}')" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-black px-2.5 py-0.5 rounded-full text-[10px] inline-flex items-center gap-1 transition shadow-2xs hover:scale-105 active:scale-95 cursor-pointer"><i class="fas fa-bell"></i> ສົ່ງເຕືອນດ່ວນ</button>`;
+          }
+
+          statusBadge = `<span class="bg-amber-100 text-amber-900 border border-amber-300 font-bold px-2.5 py-1 rounded-full text-[11px] inline-flex items-center gap-1 shadow-2xs"><i class="fas fa-map-marker-alt text-amber-600"></i> ຮອດປາຍທາງ</span>`;
+
+          if (rCount >= 3) {
+            rowClass = 'bg-purple-50/40 hover:bg-purple-50/80 transition border-l-4 border-l-purple-600';
+            cardBorder = 'border-purple-300 bg-purple-50/30';
+            arrivalBadge = `
+              <div class="flex flex-col items-center gap-1">
+                <button onclick="viewReminderHistory('${tracking}')" class="bg-purple-100 hover:bg-purple-200 text-purple-900 border border-purple-300 font-bold px-2.5 py-0.5 rounded-full text-[10px] inline-flex items-center gap-1 shadow-2xs transition cursor-pointer">
+                  <span class="w-1.5 h-1.5 rounded-full bg-purple-600 animate-ping"></span> 🔔 ເຕືອນ ${rCount} ຄັ້ງ
+                </button>
+                <div class="flex items-center gap-1.5">${daysBadge} ${sendBtn}</div>
+              </div>
+            `;
+          } else if (rCount === 2) {
+            rowClass = 'bg-orange-50/40 hover:bg-orange-50/80 transition border-l-4 border-l-orange-500';
+            cardBorder = 'border-orange-300 bg-orange-50/30';
+            arrivalBadge = `
+              <div class="flex flex-col items-center gap-1">
+                <button onclick="viewReminderHistory('${tracking}')" class="bg-orange-100 hover:bg-orange-200 text-orange-950 border border-orange-300 font-bold px-2.5 py-0.5 rounded-full text-[10px] inline-flex items-center gap-1 shadow-2xs transition cursor-pointer">
+                  🔔 ເຕືອນຄັ້ງ 2
+                </button>
+                <div class="flex items-center gap-1.5">${daysBadge} ${sendBtn}</div>
+              </div>
+            `;
+          } else if (rCount === 1) {
+            rowClass = 'bg-amber-50/50 hover:bg-amber-100/60 transition border-l-4 border-l-amber-500';
+            cardBorder = 'border-amber-300 bg-amber-50/30';
+            arrivalBadge = `
+              <div class="flex flex-col items-center gap-1">
+                <button onclick="viewReminderHistory('${tracking}')" class="bg-amber-100 hover:bg-amber-200 text-amber-950 border border-amber-300 font-bold px-2.5 py-0.5 rounded-full text-[10px] inline-flex items-center gap-1 shadow-2xs transition cursor-pointer">
+                  🔔 ເຕືອນຄັ້ງ 1
+                </button>
+                <div class="flex items-center gap-1.5">${daysBadge} ${sendBtn}</div>
+              </div>
+            `;
+          } else {
+            rowClass = 'bg-slate-50/40 hover:bg-slate-100/60 transition border-l-4 border-l-slate-400';
+            cardBorder = 'border-slate-300 bg-slate-50/30';
+            arrivalBadge = `
+              <div class="flex flex-col items-center gap-1">
+                <span class="bg-slate-100 text-slate-700 border border-slate-300 font-semibold px-2.5 py-0.5 rounded-full text-[10px] inline-flex items-center gap-1">
+                  ⚪ ຍັງບໍ່ເຕືອນ
+                </span>
+                <div class="flex items-center gap-1.5">${daysBadge} ${sendBtn}</div>
+              </div>
+            `;
+          }
+        } else {
+          rowClass = 'bg-blue-50/30 hover:bg-blue-50/60 transition border-l-4 border-l-blue-500';
+          cardBorder = 'border-blue-200 bg-blue-50/20';
+          statusBadge = `<span class="bg-blue-100 text-blue-800 border border-blue-200 font-bold px-2.5 py-1 rounded-full text-[11px] inline-flex items-center gap-1 shadow-2xs"><i class="fas fa-truck text-blue-600"></i> ກຳລັງສົ່ງ</span>`;
+        }
+
+        let waBadge = '';
+        if (isSendFailed) {
+          rowClass = 'bg-rose-50/60 hover:bg-rose-100/70 transition border-l-4 border-l-rose-700 font-medium';
+          waBadge = `
+            <div class="space-y-1 text-center">
+              <span class="bg-rose-100 text-rose-800 border border-rose-300 font-bold px-2.5 py-0.5 rounded-full text-[10px] inline-flex items-center gap-1 shadow-2xs" title="${item.last_error || 'ເບີນີ້ບໍ່ມີ WhatsApp ຫຼື ສົ່ງບໍ່ໄດ້'}">
+                <i class="fas fa-times-circle text-rose-600"></i> ❌ ສົ່ງບໍ່ໄດ້
+              </span>
+              <div>
+                <button onclick="sendSingleBill('${tracking}')" class="text-[9px] bg-rose-100 hover:bg-rose-200 text-rose-800 font-bold px-2 py-0.5 rounded-full transition shadow-2xs cursor-pointer">
+                  <i class="fas fa-redo mr-0.5"></i> ລອງໃໝ່
+                </button>
+              </div>
+            </div>
+          `;
+        } else if (item.sent_to_whatsapp) {
+          waBadge = `
+            <div class="text-center">
+              <span class="bg-emerald-100 text-emerald-800 border border-emerald-300 font-bold px-2.5 py-0.5 rounded-full text-[10px] inline-flex items-center gap-1 shadow-2xs">
+                <i class="fab fa-whatsapp text-emerald-600"></i> ສົ່ງແລ້ວ
+              </span>
+            </div>
+          `;
+        } else {
+          waBadge = `
+            <div class="space-y-1 text-center">
+              <span class="bg-amber-100 text-amber-900 border border-amber-300 font-bold px-2.5 py-0.5 rounded-full text-[10px] inline-flex items-center gap-1 shadow-2xs">
+                <i class="far fa-clock text-amber-600"></i> ຍັງບໍ່ໄດ້ສົ່ງ
+              </span>
+              <div>
+                <button onclick="sendSingleBill('${tracking}')" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-2.5 py-0.5 rounded-full text-[10px] inline-flex items-center gap-1 transition shadow-xs hover:scale-105 active:scale-95 cursor-pointer">
+                  <i class="fab fa-whatsapp"></i> ສົ່ງດ່ວນ
+                </button>
+              </div>
+            </div>
+          `;
+        }
+
+        tableRows.push(`
+          <tr class="${rowClass}">
+            <td class="py-3 px-3 font-mono text-slate-400 text-center font-semibold text-xs">${idx + 1}</td>
+            <td class="py-3 px-3 text-center">${carrierBadge}</td>
+            <td class="py-3 px-3 font-mono text-xs text-slate-600 whitespace-nowrap">${dateStr}</td>
+            <td class="py-3 px-3">
+              <div class="font-bold text-slate-900 font-mono text-xs flex items-center gap-1.5">
+                <span>${tracking}</span>
+                <button onclick="copyToClipboard('${tracking}', 'ກັອບປີ້ເລກບິນ #${tracking} ແລ້ວ!')" class="text-slate-400 hover:text-slate-700 text-xs p-0.5 cursor-pointer" title="ກັອບປີ້ເລກບິນ">
+                  <i class="far fa-copy"></i>
+                </button>
+              </div>
+            </td>
+            <td class="py-3 px-3">
+              <div class="font-bold text-slate-900 text-xs">${name}</div>
+              <a href="tel:${phone.replace(/[^0-9+]/g, '')}" class="font-mono text-[11px] text-blue-600 hover:underline inline-flex items-center gap-1">
+                <i class="fas fa-phone text-[9px] text-slate-400"></i> ${phone}
+              </a>
+            </td>
+            <td class="py-3 px-3 text-slate-700 text-xs max-w-[150px] truncate" title="${branch}">
+              <div class="flex items-center gap-1">
+                <i class="fas fa-map-pin text-[10px] text-slate-400 flex-shrink-0"></i>
+                <span class="truncate">${branch}</span>
+              </div>
+            </td>
+            <td class="py-3 px-3 font-bold text-indigo-700 font-mono text-xs whitespace-nowrap">${codExp}</td>
+            <td class="py-3 px-3 font-bold text-teal-700 font-mono text-xs whitespace-nowrap">${codCol}</td>
+            <td class="py-3 px-3 text-center whitespace-nowrap">${statusBadge}</td>
+            <td class="py-3 px-3 text-center whitespace-nowrap">${waBadge}</td>
+            <td class="py-3 px-3 text-center">${arrivalBadge}</td>
+            <td class="py-3 px-3 text-center">
+              <div class="flex items-center justify-center gap-1">
+                <a href="${shareUrl}" target="_blank" class="text-slate-700 hover:text-red-600 bg-white hover:bg-red-50 px-2.5 py-1 rounded-xl font-bold inline-flex items-center gap-1 text-[11px] transition border border-slate-200 shadow-2xs" title="ເບິ່ງໃບບິນ">
+                  <i class="fas fa-receipt text-red-500 text-[10px]"></i> ໃບບິນ
+                </a>
+                ${currentStatusFilter === 'hidden' ? `
+                  <button onclick="unhideBill('${tracking}')" class="text-blue-700 bg-blue-50 hover:bg-blue-100 px-2.5 py-1 rounded-xl font-bold inline-flex items-center gap-1 text-[11px] transition border border-blue-200 cursor-pointer shadow-2xs" title="ສະແດງບິນນີ້ຄືນ">
+                    <i class="fas fa-eye"></i> ສະແດງຄືນ
+                  </button>
+                ` : `
+                  <button onclick="hideBill('${tracking}')" class="text-slate-400 hover:text-slate-700 hover:bg-slate-100 p-1.5 rounded-xl text-xs transition cursor-pointer" title="ຊ່ອນບິນນີ້">
+                    <i class="fas fa-eye-slash"></i>
+                  </button>
+                `}
+              </div>
+            </td>
+          </tr>
+        `);
+
+        cardItems.push(`
+          <div class="rounded-3xl border-2 ${cardBorder} p-4 shadow-xs space-y-3 transition relative">
+            <div class="flex items-center justify-between gap-2">
+              <div class="flex items-center gap-2">
+                <span class="font-mono text-slate-400 text-xs font-bold">#${idx + 1}</span>
+                ${carrierBadge}
+              </div>
+              <div class="flex items-center gap-1.5">
+                ${statusBadge}
+              </div>
+            </div>
+            <div class="bg-slate-50/90 rounded-2xl p-2.5 border border-slate-200/80 flex items-center justify-between gap-2">
+              <div>
+                <div class="text-[10px] text-slate-400 font-semibold">ເລກບິນ / Tracking</div>
+                <div class="font-bold text-slate-900 font-mono text-sm tracking-wide flex items-center gap-1.5">
+                  <span>${tracking}</span>
+                  <button onclick="copyToClipboard('${tracking}', 'ກັອບປີ້ເລກບິນ #${tracking} ແລ້ວ!')" class="text-slate-400 hover:text-slate-700 text-xs p-0.5 cursor-pointer" title="ກັອບປີ້ເລກບິນ">
+                    <i class="far fa-copy"></i>
+                  </button>
+                </div>
+              </div>
+              <div class="text-right">
+                <div class="text-[10px] text-slate-400 font-semibold">ວັນທີຝາກ</div>
+                <div class="font-mono text-xs font-semibold text-slate-700">${dateStr}</div>
+              </div>
+            </div>
+            <div class="grid grid-cols-2 gap-2 text-xs">
+              <div class="bg-white p-2.5 rounded-2xl border border-slate-200">
+                <div class="text-[10px] text-slate-400 font-semibold mb-0.5 flex items-center gap-1">
+                  <i class="fas fa-user text-slate-400"></i> ຜູ້ຮັບ
+                </div>
+                <div class="font-bold text-slate-900 truncate" title="${name}">${name}</div>
+                <a href="tel:${phone.replace(/[^0-9+]/g, '')}" class="font-mono text-[11px] text-blue-600 hover:underline flex items-center gap-1 mt-0.5 font-bold">
+                  <i class="fas fa-phone text-[9px]"></i> ${phone}
+                </a>
+              </div>
+              <div class="bg-white p-2.5 rounded-2xl border border-slate-200">
+                <div class="text-[10px] text-slate-400 font-semibold mb-0.5 flex items-center gap-1">
+                  <i class="fas fa-location-dot text-slate-400"></i> ສາຂາປາຍທາງ
+                </div>
+                <div class="font-medium text-slate-800 truncate text-[11px]" title="${branch}">${branch}</div>
+                <div class="font-mono text-[11px] font-bold text-indigo-700 mt-0.5">COD: ${codExp}</div>
+              </div>
+            </div>
+            <div class="flex items-center justify-between gap-2 pt-2 border-t border-slate-200/80 text-xs">
+              <div class="flex items-center gap-2 flex-wrap flex-1">
+                ${waBadge}
+                ${arrivalBadge}
+              </div>
+              <div class="flex items-center gap-1.5 flex-shrink-0">
+                <a href="${shareUrl}" target="_blank" class="px-2.5 py-1.5 rounded-xl bg-white border border-slate-200 text-slate-700 hover:text-red-600 text-[11px] font-bold inline-flex items-center gap-1 shadow-2xs">
+                  <i class="fas fa-receipt text-red-500"></i> ໃບບິນ
+                </a>
+                ${currentStatusFilter === 'hidden' ? `
+                  <button onclick="unhideBill('${tracking}')" class="px-2.5 py-1.5 rounded-xl bg-blue-50 border border-blue-200 text-blue-700 hover:bg-blue-100 text-[11px] font-bold inline-flex items-center gap-1 shadow-2xs cursor-pointer">
+                    <i class="fas fa-eye"></i> ສະແດງຄືນ
+                  </button>
+                ` : `
+                  <button onclick="hideBill('${tracking}')" class="px-2 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-800 text-[11px] font-medium inline-flex items-center gap-1 transition cursor-pointer" title="ຊ່ອນບິນນີ້">
+                    <i class="fas fa-eye-slash"></i> ຊ່ອນ
+                  </button>
+                `}
+              </div>
+            </div>
+          </div>
+        `);
+      });
+
+      if (currentStatusFilter === 'hidden') {
+        const hiddenBanner = `
+          <div class="col-span-full mb-2 bg-amber-50 border border-amber-200 p-3 rounded-2xl flex items-center justify-between text-xs">
+            <div class="flex items-center gap-2 text-amber-900 font-bold">
+              <i class="fas fa-eye-slash text-amber-600"></i>
+              <span>ກຳລັງສະແດງບິນທີ່ຖືກຊ່ອນໄວ້ (${filtered.length} ລາຍການ)</span>
+            </div>
+            <button onclick="unhideAllBills()" class="bg-white hover:bg-slate-50 text-slate-800 font-bold px-3 py-1 rounded-xl border border-slate-200 shadow-2xs transition flex items-center gap-1 cursor-pointer text-xs">
+              <i class="fas fa-eye text-blue-600"></i> ສະແດງທັງໝົດຄືນ
+            </button>
+          </div>
+        `;
+        if (cardsContainer) cardsContainer.innerHTML = hiddenBanner + (cardItems.length ? cardItems.join('') : '<div class="col-span-full py-8 text-center text-slate-400">ບໍ່ມີບິນທີ່ຖືກຊ່ອນ</div>');
+        if (tbody) tbody.innerHTML = tableRows.length ? tableRows.join('') : '<tr><td colspan="12" class="py-8 text-center text-slate-400">ບໍ່ມີບິນທີ່ຖືກຊ່ອນ</td></tr>';
+      } else {
+        if (tbody) tbody.innerHTML = tableRows.length ? tableRows.join('') : '<tr><td colspan="12" class="py-8 text-center text-slate-400">ບໍ່ມີລາຍການໃບບິນທີ່ຕົງກັບເງື່ອນໄຂ</td></tr>';
+        if (cardsContainer) cardsContainer.innerHTML = cardItems.length ? cardItems.join('') : '<div class="col-span-full py-8 text-center text-slate-400">ບໍ່ມີລາຍການໃບບິນທີ່ຕົງກັບເງື່ອນໄຂ</div>';
+      }
+    }
+
+    async function sendSingleBill(tracking) {
+      const entry = cachedBills.find(([t]) => t === tracking);
+      const item = entry ? entry[1] : {};
+      const phone = item.recipientPhone || '';
+      const name = item.recipientName || 'ລູກຄ້າ';
+      if (!confirm(`ຢືນຢັນການສົ່ງໃບບິນ #${tracking} ຫາ WhatsApp: ${phone} (${name})?`)) return;
+
+      try {
+        const res = await fetch('/api/send-bill', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ tracking, phone, name })
+        });
+        const data = await res.json();
+        if (data.success) {
+          alert('✅ ' + (data.message || 'ສົ່ງໃບບິນເຂົ້າ WhatsApp ສຳເລັດແລ້ວ!'));
+          loadBills();
+        } else {
+          alert('❌ ຜິດພາດ: ' + (data.error || 'ສົ່ງບໍ່ສຳເລັດ'));
+          loadBills();
+        }
+      } catch (err) {
+        alert('❌ ຜິດພາດ: ' + err.message);
+      }
+    }
+
+    let activeEventSource = null;
+    let currentFailedList = [];
+
+    function openProgressModal(title, subtitle) {
+      document.getElementById('progress-modal-title').textContent = title || 'ກຳລັງສົ່ງຂໍ້ຄວາມ WhatsApp...';
+      document.getElementById('progress-modal-subtitle').textContent = subtitle || 'ລະບົບກຳລັງກວດສອບເບີ ແລະ ສົ່ງໃບບິນພ້ອມຮູບພາບ';
+      document.getElementById('progress-status-label').textContent = 'ກຳລັງກຽມສົ່ງ...';
+      document.getElementById('progress-percentage').textContent = '0%';
+      document.getElementById('progress-bar-fill').style.width = '0%';
+      document.getElementById('progress-count-current').textContent = '0';
+      document.getElementById('progress-count-total').textContent = '0';
+      document.getElementById('progress-count-success').textContent = '0';
+      document.getElementById('progress-count-failed').textContent = '0';
+      document.getElementById('progress-logs').innerHTML = `<div class="text-slate-400 italic">ເລີ່ມຕົ້ນເຊື່ອມຕໍ່ລະບົບສົ່ງ WhatsApp...</div>`;
+      document.getElementById('progress-summary-container').classList.add('hidden');
+      document.getElementById('failed-section').classList.add('hidden');
+      document.getElementById('failed-table-body').innerHTML = '';
+      document.getElementById('progress-spinner').classList.remove('hidden');
+      document.getElementById('progress-live-badge').classList.remove('hidden');
+      document.getElementById('progress-footer-msg').textContent = 'ກະລຸນາຢ່າປິດໜ້າຈໍຂະນະທີ່ກຳລັງສົ່ງ...';
+      document.getElementById('progress-modal').classList.remove('hidden');
+      currentFailedList = [];
+    }
+
+    function closeProgressModal() {
+      if (activeEventSource) {
+        activeEventSource.close();
+        activeEventSource = null;
+      }
+      document.getElementById('progress-modal').classList.add('hidden');
+      loadBills();
+    }
+
+    function copyFailedNumbers() {
+      if (!currentFailedList || currentFailedList.length === 0) return alert('ບໍ່ມີລາຍການເບີທີ່ສົ່ງບໍ່ໄດ້');
+      const lines = currentFailedList.map(f => `${f.tracking}\t${f.name}\t${f.phone}\t${f.reason}`).join('\n');
+      navigator.clipboard.writeText(lines).then(() => {
+        alert(`📋 ກັອບປີ້ລາຍຊື່ເບີທີ່ສົ່ງບໍ່ໄດ້ ${currentFailedList.length} ລາຍການແລ້ວ!`);
+      }).catch(err => {
+        alert('ບໍ່ສາມາດກັອບປີ້ໄດ້: ' + err.message);
+      });
+    }
+
+    function startStreamingTask(streamUrl, title, subtitle) {
+      openProgressModal(title, subtitle);
+
+      if (activeEventSource) {
+        activeEventSource.close();
+      }
+
+      const es = new EventSource(streamUrl);
+      activeEventSource = es;
+
+      const logContainer = document.getElementById('progress-logs');
+
+      es.onmessage = (event) => {
+        try {
+          const data = JSON.parse(event.data);
+
+          if (data.type === 'init') {
+            document.getElementById('progress-count-total').textContent = data.total;
+            document.getElementById('progress-status-label').textContent = `ກຳລັງສົ່ງ 0 / ${data.total} ລາຍການ...`;
+            logContainer.innerHTML += `<div class="text-emerald-400">🚀 ເລີ່ມຕົ້ນສົ່ງທັງໝົດ ${data.total} ລາຍການ</div>`;
+          } else if (data.type === 'progress') {
+            const current = data.current;
+            const total = data.total;
+            const pct = Math.min(100, Math.round((current / total) * 100));
+
+            document.getElementById('progress-count-current').textContent = current;
+            document.getElementById('progress-percentage').textContent = `${pct}%`;
+            document.getElementById('progress-bar-fill').style.width = `${pct}%`;
+            document.getElementById('progress-status-label').textContent = `ກຳລັງສົ່ງ ${current} / ${total} ລາຍການ...`;
+
+            if (data.status === 'success') {
+              const prevSuccess = parseInt(document.getElementById('progress-count-success').textContent || '0', 10);
+              document.getElementById('progress-count-success').textContent = prevSuccess + 1;
+              logContainer.innerHTML += `
+                <div class="text-emerald-300 flex items-start gap-1.5 leading-relaxed">
+                  <span class="text-emerald-400 font-bold">[${current}/${total}]</span>
+                  <span>#${data.tracking} ➡️ <strong>${data.phone}</strong> (${data.name}): ✅ ສົ່ງສຳເລັດ</span>
+                </div>
+              `;
+            } else {
+              const prevFailed = parseInt(document.getElementById('progress-count-failed').textContent || '0', 10);
+              document.getElementById('progress-count-failed').textContent = prevFailed + 1;
+              logContainer.innerHTML += `
+                <div class="text-rose-400 flex items-start gap-1.5 leading-relaxed bg-rose-950/40 p-1 rounded">
+                  <span class="text-rose-500 font-bold">[${current}/${total}]</span>
+                  <span>#${data.tracking} ➡️ <strong>${data.phone}</strong> (${data.name}): ❌ ${data.reason}</span>
+                </div>
+              `;
+            }
+            logContainer.scrollTop = logContainer.scrollHeight;
+          } else if (data.type === 'done') {
+            es.close();
+            activeEventSource = null;
+
+            document.getElementById('progress-spinner').classList.add('hidden');
+            document.getElementById('progress-live-badge').classList.add('hidden');
+            document.getElementById('progress-percentage').textContent = '100%';
+            document.getElementById('progress-bar-fill').style.width = '100%';
+            document.getElementById('progress-status-label').textContent = '🎉 ສຳເລັດການສົ່ງແລ້ວ!';
+            document.getElementById('progress-footer-msg').textContent = 'ດຳເນີນການສຳເລັດແລ້ວ ທ່ານສາມາດກວດເບິ່ງລາຍການສະຫຼຸບຂ້າງລຸ່ມ';
+
+            // Populate summary view
+            document.getElementById('sum-total').textContent = data.total;
+            document.getElementById('sum-success').textContent = data.successCount;
+            document.getElementById('sum-failed').textContent = data.failedCount;
+            document.getElementById('progress-summary-container').classList.remove('hidden');
+
+            currentFailedList = data.failedList || [];
+            if (currentFailedList.length > 0) {
+              const failedSection = document.getElementById('failed-section');
+              failedSection.classList.remove('hidden');
+              const tbody = document.getElementById('failed-table-body');
+              tbody.innerHTML = currentFailedList.map(f => `
+                <tr class="hover:bg-rose-100/50">
+                  <td class="py-1.5 px-2.5 font-bold text-slate-900">${f.tracking}</td>
+                  <td class="py-1.5 px-2.5 font-sans">
+                    <div class="font-medium text-slate-800">${f.name}</div>
+                    <div class="text-[10px] text-slate-500 font-mono">${f.phone} (${f.carrier || 'ຂົນສົ່ງ'})</div>
+                  </td>
+                  <td class="py-1.5 px-2.5 text-rose-700 font-sans font-semibold">${f.reason}</td>
+                </tr>
+              `).join('');
+            }
+
+            logContainer.innerHTML += `<div class="text-amber-300 font-bold mt-2">🏁 ສະຫຼຸບ: ${data.message || 'ສຳເລັດ'}</div>`;
+            logContainer.scrollTop = logContainer.scrollHeight;
+            loadBills();
+          } else if (data.type === 'error') {
+            es.close();
+            activeEventSource = null;
+            document.getElementById('progress-spinner').classList.add('hidden');
+            document.getElementById('progress-status-label').textContent = '❌ ເກີດຂໍ້ຜິດພາດ';
+            logContainer.innerHTML += `<div class="text-rose-400 font-bold mt-2">❌ ຜິດພາດ: ${data.error}</div>`;
+          }
+        } catch (err) {
+          console.error('SSE JSON error:', err);
+        }
+      };
+
+      es.onerror = (err) => {
+        console.error('SSE connection error:', err);
+        es.close();
+        activeEventSource = null;
+        document.getElementById('progress-spinner').classList.add('hidden');
+        document.getElementById('progress-status-label').textContent = '⚠️ ການເຊື່ອມຕໍ່ສິ້ນສຸດລົງ';
+        loadBills();
+      };
+    }
+
+    function sendAllWhatsApp() {
+      const carrierParam = currentCarrierFilter !== 'all' ? `?carrier=${encodeURIComponent(currentCarrierFilter)}` : '';
+      const carrierName = currentCarrierFilter === 'all' ? 'ທຸກຂົນສົ່ງ' : currentCarrierFilter;
+      if (!confirm(`ຢືນຢັນການເລີ່ມຕົ້ນສົ່ງໃບບິນເຂົ້າ WhatsApp (${carrierName}) ທັງໝົດທີ່ຍັງບໍ່ທັນສົ່ງ?`)) {
+        return;
+      }
+      startStreamingTask(
+        `/api/send-all-whatsapp-stream${carrierParam}`,
+        `📦 ກຳລັງສົ່ງໃບບິນເຂົ້າ WhatsApp (${carrierName})`,
+        'ລະບົບກຳລັງກວດສອບເບີ, ດາວໂຫຼດຮູບໃບບິນ ແລະ ສົ່ງຫາລູກຄ້າ'
+      );
+    }
+
+    function sendAllArrivalReminders() {
+      const carrierParam = currentCarrierFilter !== 'all' ? `?carrier=${encodeURIComponent(currentCarrierFilter)}` : '';
+      const carrierName = currentCarrierFilter === 'all' ? 'ທຸກຂົນສົ່ງ' : currentCarrierFilter;
+      if (!confirm(`ຢືນຢັນການເລີ່ມຕົ້ນສົ່ງ WhatsApp ແຈ້ງເຕືອນລູກຄ້າ (${carrierName}) ທີ່ເຄື່ອງ "ຮອດປາຍທາງແລ້ວ"?`)) {
+        return;
+      }
+      startStreamingTask(
+        `/api/send-all-arrival-reminders-stream${carrierParam}`,
+        `🔔 ກຳລັງສົ່ງແຈ້ງເຕືອນຮອດປາຍທາງ (${carrierName})`,
+        'ກວດສອບເບີ ແລະ ສົ່ງແຈ້ງເຕືອນພ້ອມຮູບໃບບິນຫາລູກຄ້າທີ່ຮອດກຳນົດ'
+      );
+    }
+
+    function sendAllReturnedNotifications() {
+      const carrierParam = currentCarrierFilter !== 'all' ? `?carrier=${encodeURIComponent(currentCarrierFilter)}` : '';
+      const carrierName = currentCarrierFilter === 'all' ? 'ທຸກຂົນສົ່ງ' : currentCarrierFilter;
+      if (!confirm(`ຢືນຢັນການເລີ່ມຕົ້ນສົ່ງ WhatsApp ແຈ້ງເຕືອນພັດສະດຸຕີກັບ (${carrierName}) (ຄ່າຝາກ x2) ທັງໝົດ?`)) {
+        return;
+      }
+      startStreamingTask(
+        `/api/send-all-returned-notifications-stream${carrierParam}`,
+        `↩️ ກຳລັງສົ່ງແຈ້ງເຕືອນຕີກັບ (${carrierName}) (ຄ່າຝາກ x2)`,
+        'ສົ່ງຂໍ້ຄວາມແຈ້ງເຕືອນໂອນຄ່າຝາກ x2 ຫາລູກຄ້າທີ່ເຄື່ອງຕີກັບ'
+      );
+    }
+
+    async function sendReturnedNotification(tracking) {
+      if (!confirm(`ຢືນຢັນການສົ່ງແຈ້ງເຕືອນ "ພັດສະດຸຕີກັບ (ຄ່າຝາກ x2)" ສຳລັບເລກບິນ #${tracking}?`)) {
+        return;
+      }
+
+      try {
+        const res = await fetch('/api/send-returned-notification', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ tracking })
+        });
+        const data = await res.json();
+        if (data.success) {
+          alert('✅ ' + data.message);
+          loadBills();
+        } else {
+          alert('❌ ຜິດພາດ: ' + (data.error || 'ສົ່ງບໍ່ສຳເລັດ'));
+        }
+      } catch (err) {
+        alert('❌ ຜິດພາດ: ' + err.message);
+      }
+    }
+
+    async function markAllAsSent() {
+      const carrierName = currentCarrierFilter === 'all' ? 'ທຸກຂົນສົ່ງ' : currentCarrierFilter;
+      if (!confirm(`ຢືນຢັນການໝາຍວ່າ "ສົ່ງໃບບິນແລ້ວທັງໝົດ" ສຳລັບ ${carrierName}?\n\n(ລະບົບຈະປັບສະຖານະບິນເກົ່າທັງໝົດເປັນສົ່ງແລ້ວ ແລະ ເລີ່ມນັບສະເພາະບິນໃໝ່ຕັ້ງແຕ່ນີ້ເປັນຕົ້ນໄປ)`)) {
+        return;
+      }
+
+      try {
+        const res = await fetch('/api/mark-all-sent', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ carrier: currentCarrierFilter })
+        });
+        const data = await res.json();
+        if (data.success) {
+          alert('✅ ' + data.message);
+          loadBills();
+        } else {
+          alert('❌ ຜິດພາດ: ' + (data.error || 'ດຳເນີນການບໍ່ສຳເລັດ'));
+        }
+      } catch (err) {
+        alert('❌ ຜິດພາດ: ' + err.message);
+      }
+    }
+
+    async function markAllRemindersAsSent() {
+      const carrierName = currentCarrierFilter === 'all' ? 'ທຸກຂົນສົ່ງ' : currentCarrierFilter;
+      if (!confirm(`ຢືນຢັນການໝາຍວ່າ "ແຈ້ງເຕືອນຮອດປາຍທາງແລ້ວທັງໝົດ" ສຳລັບ ${carrierName}?\n\n(ລະບົບຈະປັບສະຖານະບິນຮອດປາຍທາງປັດຈຸບັນວ່າແຈ້ງແລ້ວ ແລະ ເລີ່ມນັບຮອບເຕືອນ 48h ຕັ້ງແຕ່ນີ້ເປັນຕົ້ນໄປ)`)) {
+        return;
+      }
+
+      try {
+        const res = await fetch('/api/mark-all-reminders-sent', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ carrier: currentCarrierFilter })
+        });
+        const data = await res.json();
+        if (data.success) {
+          alert('✅ ' + data.message);
+          loadBills();
+        } else {
+          alert('❌ ຜິດພາດ: ' + (data.error || 'ດຳເນີນການບໍ່ສຳເລັດ'));
+        }
+      } catch (err) {
+        alert('❌ ຜິດພາດ: ' + err.message);
+      }
+    }
+
+    async function uploadCsvFile(e) {
+      e.preventDefault();
+      const fileInput = document.getElementById('csv-file-input');
+      const file = fileInput.files[0];
+      const feedback = document.getElementById('csv-feedback');
+      const btn = document.getElementById('btn-submit-csv');
+
+      if (!file) {
+        feedback.className = 'mt-3 text-xs block p-3 rounded-xl bg-amber-50 text-amber-800 border border-amber-200';
+        feedback.innerHTML = '⚠️ ກະລຸນາເລືອກໄຟລ໌ CSV ຫຼື Excel ກ່ອນກົດນຳເຂົ້າ';
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append('file', file);
+
+      btn.disabled = true;
+      btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> ກຳລັງນຳເຂົ້າ...`;
+      feedback.className = 'mt-3 text-xs hidden p-3 rounded-xl';
+
+      try {
+        const res = await fetch('/api/upload-csv', {
+          method: 'POST',
+          body: formData
+        });
+        const data = await res.json();
+
+        if (data.success) {
+          feedback.className = 'mt-3 text-xs block p-3 rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-200';
+          feedback.innerHTML = `✅ <strong>ສຳເລັດ:</strong> ${data.message}! ກົດປຸ່ມ <em>"ສົ່ງ WhatsApp ທັງໝົດ"</em> ເພື່ອເລີ່ມສົ່ງ.`;
+          loadBills();
+        } else {
+          feedback.className = 'mt-3 text-xs block p-3 rounded-xl bg-red-50 text-red-800 border border-red-200';
+          feedback.innerHTML = `❌ <strong>ຜິດພາດ:</strong> ${data.error || 'ນຳເຂົ້າໄຟລ໌ບໍ່ສຳເລັດ'}`;
+        }
+      } catch (err) {
+        feedback.className = 'mt-3 text-xs block p-3 rounded-xl bg-red-50 text-red-800 border border-red-200';
+        feedback.innerHTML = `❌ <strong>ຜິດພາດ:</strong> ${err.message}`;
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = `<i class="fas fa-upload"></i> ນຳເຂົ້າຂໍ້ມູນຈາກໄຟລ໌`;
+      }
+    }
+
+    function viewReminderHistory(tracking) {
+      const entry = cachedBills.find(([t]) => t === tracking);
+      if (!entry) return;
+      const [t, item] = entry;
+      const history = item.reminder_history || [];
+      const content = document.getElementById('history-modal-content');
+
+      let html = `
+        <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 mb-3">
+          <div class="font-bold text-slate-900 font-mono text-sm">ເລກບິນ: #${tracking}</div>
+          <div class="text-slate-600">ຜູ້ຮັບ: <strong>${item.recipientName || 'ລູກຄ້າ'}</strong> (${item.recipientPhone})</div>
+          <div class="text-slate-600">ສາຂາ: ${item.destinationBranch || '-'}</div>
+          <div class="text-amber-800 font-semibold mt-1">ຈຳນວນເຕືອນທັງໝົດ: ${item.reminder_count || history.length || 1} ຄັ້ງ</div>
+        </div>
+      `;
+
+      if (history.length === 0) {
+        const lastTime = item.last_reminded_at || item.notified_arrival_at || item.sent_at;
+        html += `
+          <div class="border rounded-xl p-3 bg-amber-50/50 border-amber-200">
+            <div class="font-semibold text-amber-900">🔔 ເຕືອນຄັ້ງທີ 1</div>
+            <div class="text-[11px] text-slate-500 font-mono">${lastTime ? new Date(lastTime).toLocaleString('lo-LA') : '-'}</div>
+            <div class="text-[11px] text-emerald-700 mt-1"><i class="fas fa-check-circle"></i> ສົ່ງຂໍ້ຄວາມແຈ້ງເຕືອນຮອດປາຍທາງແລ້ວ</div>
+          </div>
+        `;
+      } else {
+        html += '<div class="space-y-2">';
+        history.forEach((h, idx) => {
+          const timeStr = h.timestamp ? new Date(h.timestamp).toLocaleString('lo-LA') : '-';
+          html += `
+            <div class="border rounded-xl p-3 bg-white border-slate-200 shadow-sm flex items-start justify-between">
+              <div>
+                <div class="font-bold text-slate-800 flex items-center gap-1.5">
+                  <span class="w-5 h-5 bg-amber-100 text-amber-800 rounded-full inline-flex items-center justify-center text-[10px] font-mono">#${h.reminder_num || idx + 1}</span>
+                  ເຕືອນຄັ້ງທີ ${h.reminder_num || idx + 1}
+                </div>
+                <div class="text-[10px] text-slate-400 font-mono mt-0.5">${timeStr}</div>
+                <div class="text-[11px] text-slate-600 mt-1">ປະເພດ: ${h.type || 'ແຈ້ງເຕືອນຮັບເຄື່ອງ'}</div>
+              </div>
+              <span class="bg-emerald-100 text-emerald-700 text-[10px] font-semibold px-2 py-0.5 rounded-full">
+                <i class="fas fa-check"></i> ສົ່ງແລ້ວ
+              </span>
+            </div>
+          `;
+        });
+        html += '</div>';
+      }
+
+      content.innerHTML = html;
+      document.getElementById('history-modal').classList.remove('hidden');
+    }
+
+    function closeHistoryModal() {
+      document.getElementById('history-modal').classList.add('hidden');
+    }
+
+    async function sendArrivalReminder(tracking) {
+      if (!confirm(`ຢືນຢັນການສົ່ງຂໍ້ຄວາມແຈ້ງເຕືອນ "ເຄື່ອງຮອດປາຍທາງແລ້ວ" ສຳລັບເລກບິນ #${tracking}?`)) {
+        return;
+      }
+
+      try {
+        const res = await fetch('/api/send-arrival-reminder', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ tracking })
+        });
+        const data = await res.json();
+        if (data.success) {
+          alert('✅ ' + data.message);
+          loadBills();
+        } else {
+          alert('❌ ຜິດພາດ: ' + (data.error || 'ສົ່ງບໍ່ສຳເລັດ'));
+        }
+      } catch (err) {
+        alert('❌ ຜິດພາດ: ' + err.message);
+      }
+    }
+
+    function updateDashboardStats() {
+      // 1. Filter by date first
+      const dateMatchedBills = cachedBills.filter(([t, item]) => checkItemMatchesDate(item));
+
+      // 2. Count overall carrier totals for the date preset
+      let totalAll = dateMatchedBills.length;
+      let totalAnousith = 0;
+      let totalHal = 0;
+
+      dateMatchedBills.forEach(([t, item]) => {
+        const carrier = item.carrier || (t.startsWith('HAL') || t.startsWith('HA') ? 'HAL Express' : 'Anousith Express');
+        if (carrier.includes('HAL') || carrier.includes('ຮຸ່ງອາລຸນ')) {
+          totalHal++;
+        } else {
+          totalAnousith++;
+        }
+      });
+
+      const elCarrierAll = document.getElementById('carrier-cnt-all');
+      const elCarrierAno = document.getElementById('carrier-cnt-anousith');
+      const elCarrierHal = document.getElementById('carrier-cnt-hal');
+      if (elCarrierAll) elCarrierAll.textContent = totalAll;
+      if (elCarrierAno) elCarrierAno.textContent = totalAnousith;
+      if (elCarrierHal) elCarrierHal.textContent = totalHal;
+
+      // 3. Filter by currentCarrierFilter for KPIs, status counts, and reminder frequency breakdown
+      let carrierMatchedBills = dateMatchedBills;
+      if (currentCarrierFilter !== 'all') {
+        carrierMatchedBills = dateMatchedBills.filter(([t, item]) => {
+          const carrier = item.carrier || (t.startsWith('HAL') || t.startsWith('HA') ? 'HAL Express' : 'Anousith Express');
+          return carrier.toLowerCase().includes(currentCarrierFilter.toLowerCase());
+        });
+      }
+
+      let countTotal = carrierMatchedBills.length;
+      let countTransit = 0;
+      let countDest = 0;
+      let countDelivered = 0;
+      let countReturned = 0;
+      let countFailed = 0;
+      let countUnsent = 0;
+      let totalCodExpected = 0;
+      let totalCodCollected = 0;
+
+      // Reminder breakdown counts for parcels at destination
+      let remind0 = 0;
+      let remind1 = 0;
+      let remind2 = 0;
+      let remind3plus = 0;
+
+      carrierMatchedBills.forEach(([t, item]) => {
+        const st = item.shippingStatus || 'ກຳລັງຂົນສົ່ງ';
+        const isFailed = item.send_status === 'failed' || !!item.last_error || !!item.no_whatsapp;
+        if (isFailed) {
+          countFailed++;
+        } else if (!item.sent_to_whatsapp) {
+          countUnsent++;
+        }
+
+        if (st.includes('ຕີກັບ')) {
+          countReturned++;
+        } else if (st.includes('ສຳເລັດ') || st.includes('ຮັບເຄື່ອງ')) {
+          countDelivered++;
+        } else if (st.includes('ຮອດປາຍທາງ')) {
+          countDest++;
+          const rCount = item.reminder_count || (item.notified_arrival ? 1 : 0);
+          if (rCount === 0) remind0++;
+          else if (rCount === 1) remind1++;
+          else if (rCount === 2) remind2++;
+          else remind3plus++;
+        } else {
+          countTransit++;
+        }
+
+        const expNum = item.codExpectedNum || parseFloat((item.codExpected || '').replace(/[^0-9.]/g, '')) || 0;
+        const colNum = item.codCollectedNum || parseFloat((item.codCollected || '').replace(/[^0-9.]/g, '')) || 0;
+        totalCodExpected += expNum;
+        totalCodCollected += colNum;
+      });
+
+      const totalCodPending = Math.max(0, totalCodExpected - totalCodCollected);
+
+      // Update KPI display
+      if (document.getElementById('stat-total')) document.getElementById('stat-total').textContent = countTotal.toLocaleString();
+      if (document.getElementById('stat-transit')) document.getElementById('stat-transit').textContent = countTransit.toLocaleString();
+      if (document.getElementById('stat-destination')) document.getElementById('stat-destination').textContent = countDest.toLocaleString();
+      if (document.getElementById('stat-delivered')) document.getElementById('stat-delivered').textContent = countDelivered.toLocaleString();
+      if (document.getElementById('stat-returned')) document.getElementById('stat-returned').textContent = countReturned.toLocaleString();
+
+      if (document.getElementById('stat-cod-expected')) document.getElementById('stat-cod-expected').textContent = totalCodExpected.toLocaleString() + ' KIP';
+      if (document.getElementById('stat-cod-collected')) document.getElementById('stat-cod-collected').textContent = totalCodCollected.toLocaleString() + ' KIP';
+      if (document.getElementById('stat-cod-pending')) document.getElementById('stat-cod-pending').textContent = totalCodPending.toLocaleString() + ' KIP';
+
+      // Update Status badge counters
+      const countHidden = carrierMatchedBills.filter(([t]) => hiddenBillsSet.has(t)).length;
+      if (document.getElementById('cnt-all')) document.getElementById('cnt-all').textContent = countTotal - countHidden;
+      if (document.getElementById('cnt-hidden')) document.getElementById('cnt-hidden').textContent = countHidden;
+      if (document.getElementById('cnt-unsent')) document.getElementById('cnt-unsent').textContent = countUnsent;
+      if (document.getElementById('btn-cnt-unsent')) document.getElementById('btn-cnt-unsent').textContent = countUnsent;
+      if (document.getElementById('mob-cnt-unsent')) document.getElementById('mob-cnt-unsent').textContent = countUnsent;
+      if (document.getElementById('cnt-transit')) document.getElementById('cnt-transit').textContent = countTransit;
+      if (document.getElementById('cnt-dest')) document.getElementById('cnt-dest').textContent = countDest;
+      if (document.getElementById('btn-cnt-dest')) document.getElementById('btn-cnt-dest').textContent = countDest;
+      if (document.getElementById('mob-cnt-dest')) document.getElementById('mob-cnt-dest').textContent = countDest;
+      if (document.getElementById('cnt-remind0')) document.getElementById('cnt-remind0').textContent = remind0;
+      if (document.getElementById('cnt-remind1')) document.getElementById('cnt-remind1').textContent = remind1;
+      if (document.getElementById('cnt-remind2')) document.getElementById('cnt-remind2').textContent = remind2;
+      if (document.getElementById('cnt-remind3plus')) document.getElementById('cnt-remind3plus').textContent = remind3plus;
+      if (document.getElementById('cnt-done')) document.getElementById('cnt-done').textContent = countDelivered;
+      if (document.getElementById('cnt-ret')) document.getElementById('cnt-ret').textContent = countReturned;
+      if (document.getElementById('btn-cnt-ret')) document.getElementById('btn-cnt-ret').textContent = countReturned;
+      if (document.getElementById('cnt-failed')) document.getElementById('cnt-failed').textContent = countFailed;
+
+      // Update Reminder Frequency Breakdown
+      if (document.getElementById('stat-remind-0')) document.getElementById('stat-remind-0').textContent = `${remind0} ຄົນ`;
+      if (document.getElementById('stat-remind-1')) document.getElementById('stat-remind-1').textContent = `${remind1} ຄົນ`;
+      if (document.getElementById('stat-remind-2')) document.getElementById('stat-remind-2').textContent = `${remind2} ຄົນ`;
+      if (document.getElementById('stat-remind-3plus')) document.getElementById('stat-remind-3plus').textContent = `${remind3plus} ຄົນ`;
+
+      // Update Reminder Carrier Label badge
+      const reminderCarrierLabel = document.getElementById('reminder-carrier-label');
+      if (reminderCarrierLabel) {
+        if (currentCarrierFilter === 'all') {
+          reminderCarrierLabel.className = 'bg-slate-200 text-slate-800 text-[10px] font-bold px-2 py-0.5 rounded-full border border-slate-300';
+          reminderCarrierLabel.textContent = 'ທຸກຂົນສົ່ງ';
+        } else if (currentCarrierFilter === 'HAL Express') {
+          reminderCarrierLabel.className = 'bg-amber-100 text-amber-800 text-[10px] font-bold px-2 py-0.5 rounded-full border border-amber-300';
+          reminderCarrierLabel.innerHTML = '⚡ HAL Express';
+        } else {
+          reminderCarrierLabel.className = 'bg-red-100 text-red-700 text-[10px] font-bold px-2 py-0.5 rounded-full border border-red-300';
+          reminderCarrierLabel.innerHTML = '🔴 Anousith';
+        }
+      }
+    }
+
+    let previousBillsMap = null;
+
+    function computeBillsDiff(oldMap, newMap) {
+      if (!oldMap) return { hasChanges: false, newBills: [], statusChanges: [], codChanges: [], totalChanges: 0 };
+      
+      const newBills = [];
+      const statusChanges = [];
+      const codChanges = [];
+
+      Object.entries(newMap).forEach(([tracking, item]) => {
+        if (!oldMap[tracking]) {
+          newBills.push({ tracking, item });
+        } else {
+          const oldItem = oldMap[tracking];
+          const oldStatus = (oldItem.shippingStatus || 'ກຳລັງຂົນສົ່ງ').trim();
+          const newStatus = (item.shippingStatus || 'ກຳລັງຂົນສົ່ງ').trim();
+          if (oldStatus !== newStatus) {
+            statusChanges.push({ tracking, name: item.recipientName || 'ລູກຄ້າ', oldStatus, newStatus });
+          }
+          const oldCol = oldItem.codCollected || '0 KIP';
+          const newCol = item.codCollected || '0 KIP';
+          if (oldCol !== newCol) {
+            codChanges.push({ tracking, oldCol, newCol });
+          }
+        }
+      });
+
+      const totalChanges = newBills.length + statusChanges.length + codChanges.length;
+      return {
+        hasChanges: totalChanges > 0,
+        newBills,
+        statusChanges,
+        codChanges,
+        totalChanges
+      };
+    }
+
+    function showUpdateToast(diff) {
+      const container = document.getElementById('toast-container');
+      if (!container || !diff || !diff.hasChanges) return;
+
+      const toastId = 'toast-' + Date.now();
+      const timeStr = new Date().toLocaleTimeString('lo-LA', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+
+      let itemsHtml = '';
+      if (diff.newBills.length > 0) {
+        itemsHtml += `<div class="text-blue-700 font-semibold flex items-center gap-1.5"><i class="fas fa-box text-blue-500"></i> ພົບ ${diff.newBills.length} ບິນໃໝ່</div>`;
+      }
+      if (diff.statusChanges.length > 0) {
+        const destCount = diff.statusChanges.filter(s => s.newStatus.includes('ຮອດປາຍທາງ')).length;
+        const doneCount = diff.statusChanges.filter(s => s.newStatus.includes('ສຳເລັດ') || s.newStatus.includes('ຮັບເຄື່ອງ')).length;
+        const retCount = diff.statusChanges.filter(s => s.newStatus.includes('ຕີກັບ')).length;
+
+        if (destCount > 0) itemsHtml += `<div class="text-amber-700 font-semibold flex items-center gap-1.5"><i class="fas fa-map-marker-alt text-amber-500"></i> ${destCount} ບິນປ່ຽນເປັນ "ຮອດປາຍທາງ"</div>`;
+        if (doneCount > 0) itemsHtml += `<div class="text-emerald-700 font-semibold flex items-center gap-1.5"><i class="fas fa-check-circle text-emerald-500"></i> ${doneCount} ບິນ "ຮັບເຄື່ອງແລ້ວ"</div>`;
+        if (retCount > 0) itemsHtml += `<div class="text-rose-700 font-semibold flex items-center gap-1.5"><i class="fas fa-undo-alt text-rose-500"></i> ${retCount} ບິນ "ຕີກັບ"</div>`;
+      }
+
+      const toast = document.createElement('div');
+      toast.id = toastId;
+      toast.className = 'bg-white text-slate-800 p-3.5 rounded-2xl shadow-2xl border border-slate-200 flex items-start justify-between gap-3 transform transition-all duration-300 translate-y-3 opacity-0';
+      toast.innerHTML = `
+        <div class="flex items-start gap-2.5">
+          <div class="w-7 h-7 rounded-xl bg-red-100 text-red-600 flex items-center justify-center font-bold text-xs flex-shrink-0 mt-0.5">
+            <i class="fas fa-bell animate-bounce"></i>
+          </div>
+          <div class="space-y-1">
+            <div class="flex items-center gap-2">
+              <span class="font-bold text-xs text-slate-900">ອັບເດດຂໍ້ມູນລ່າສຸດ</span>
+              <span class="text-[10px] font-mono text-slate-400 font-normal">${timeStr}</span>
+            </div>
+            <div class="text-[11px] space-y-0.5">${itemsHtml}</div>
+          </div>
+        </div>
+        <button onclick="dismissToast('${toastId}')" class="text-slate-400 hover:text-slate-600 text-sm p-0.5">&times;</button>
+      `;
+
+      container.appendChild(toast);
+      setTimeout(() => {
+        toast.classList.remove('translate-y-3', 'opacity-0');
+      }, 50);
+
+      setTimeout(() => {
+        dismissToast(toastId);
+      }, 7000);
+    }
+
+    function dismissToast(id) {
+      const el = document.getElementById(id);
+      if (el) {
+        el.classList.add('opacity-0', 'scale-95');
+        setTimeout(() => el.remove(), 300);
+      }
+    }
+
+    function openSyncModal() {
+      document.getElementById('sync-status-modal').classList.remove('hidden');
+      document.getElementById('sync-loading-body').classList.remove('hidden');
+      document.getElementById('sync-result-body').classList.add('hidden');
+      document.getElementById('sync-modal-title').textContent = 'ກຳລັງກວດສອບ & ອັບເດດຂໍ້ມູນ...';
+      document.getElementById('sync-modal-subtitle').textContent = 'ລະບົບກຳລັງເຊື່ອມຕໍ່ Anousith & HAL Express';
+      document.getElementById('sync-modal-spinner').className = 'fas fa-sync-alt fa-spin text-red-600';
+    }
+
+    function closeSyncModal() {
+      document.getElementById('sync-status-modal').classList.add('hidden');
+    }
+
+    function showSyncResultModal(data, diff) {
+      document.getElementById('sync-loading-body').classList.add('hidden');
+      document.getElementById('sync-result-body').classList.remove('hidden');
+      document.getElementById('sync-modal-title').textContent = '🎉 ຜົນການອັບເດດຂໍ້ມູນ (Sync Result)';
+      document.getElementById('sync-modal-subtitle').textContent = 'ສະແດງລາຍລະອຽດການປ່ຽນແປງສະຖານະທັງໝົດ';
+      document.getElementById('sync-modal-spinner').className = 'fas fa-check-circle text-emerald-600';
+
+      const nowStr = new Date().toLocaleTimeString('lo-LA');
+      document.getElementById('sync-time-badge').textContent = `ເວລາ ${nowStr}`;
+      if (document.getElementById('last-sync-time')) {
+        document.getElementById('last-sync-time').textContent = `Sync: ${nowStr}`;
+      }
+
+      const newCount = diff ? diff.newBills.length : 0;
+      const destCount = diff ? diff.statusChanges.filter(s => s.newStatus.includes('ຮອດປາຍທາງ')).length : 0;
+      const doneCount = diff ? diff.statusChanges.filter(s => s.newStatus.includes('ສຳເລັດ') || s.newStatus.includes('ຮັບເຄື່ອງ')).length : 0;
+
+      document.getElementById('sync-stat-new').textContent = `+${newCount}`;
+      document.getElementById('sync-stat-dest').textContent = `+${destCount}`;
+      document.getElementById('sync-stat-done').textContent = `+${doneCount}`;
+
+      const listDiv = document.getElementById('sync-details-list');
+
+      if (!diff || !diff.hasChanges) {
+        document.getElementById('sync-result-headline').textContent = '✨ ຂໍ້ມູນເປັນປັດຈຸບັນແລ້ວ!';
+        document.getElementById('sync-result-desc').textContent = 'ກວດສອບແລ້ວ ຂໍ້ມູນທັງໝົດຕົງກັບລະບົບຂົນສົ່ງ 100% (ບໍ່ພົບລາຍການປ່ຽນແປງໃໝ່)';
+        listDiv.innerHTML = `
+          <div class="text-center py-4 text-slate-400">
+            <i class="fas fa-circle-check text-2xl text-emerald-500 mb-1 block"></i>
+            ຂໍ້ມູນທັງໝົດຖືກອັບເດດສົມບູນແລ້ວ
+          </div>
+        `;
+      } else {
+        document.getElementById('sync-result-headline').textContent = `ອັບເດດສຳເລັດ! ພົບ ${diff.totalChanges} ການປ່ຽນແປງ`;
+        document.getElementById('sync-result-desc').textContent = 'ລະບົບໄດ້ປັບປຸງສະຖານະໃນຕາຕະລາງ ແລະ ສະຖິຕິຮຽບຮ້ອຍແລ້ວ';
+
+        let html = '';
+        if (diff.newBills.length > 0) {
+          html += `
+            <div class="font-bold text-slate-800 text-[11px] border-b pb-1 mb-1">📦 ລາຍການບິນໃໝ່ (+${diff.newBills.length}):</div>
+            <div class="space-y-1 mb-2">
+              ${diff.newBills.map(b => `
+                <div class="flex items-center justify-between bg-white p-1.5 rounded-lg border border-slate-200">
+                  <span class="font-mono font-bold text-slate-800">#${b.tracking}</span>
+                  <span class="text-slate-500">${b.item.recipientName || 'ລູກຄ້າ'} (${b.item.recipientPhone || '-'})</span>
+                  <span class="bg-blue-100 text-blue-800 text-[10px] font-bold px-2 py-0.5 rounded-full">ໃໝ່</span>
+                </div>
+              `).join('')}
+            </div>
+          `;
+        }
+
+        if (diff.statusChanges.length > 0) {
+          html += `
+            <div class="font-bold text-slate-800 text-[11px] border-b pb-1 mb-1">🔄 ລາຍການປ່ຽນສະຖານະ (+${diff.statusChanges.length}):</div>
+            <div class="space-y-1">
+              ${diff.statusChanges.map(s => `
+                <div class="flex items-center justify-between bg-white p-1.5 rounded-lg border border-slate-200">
+                  <span class="font-mono font-bold text-slate-800">#${s.tracking}</span>
+                  <div class="text-slate-600">${s.name}</div>
+                  <div class="flex items-center gap-1">
+                    <span class="text-slate-400 line-through text-[10px]">${s.oldStatus}</span>
+                    <i class="fas fa-arrow-right text-[9px] text-slate-400"></i>
+                    <span class="font-bold text-amber-800 text-[10px] bg-amber-100 px-1.5 py-0.5 rounded">${s.newStatus}</span>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          `;
+        }
+
+        listDiv.innerHTML = html;
+      }
+    }
+
+    let isFiltersCollapsed = false;
+    let isKpiCollapsed = false;
+
+    async function loadBills(showToast = false) {
+      try {
+        const res = await fetch('/api/bills');
+        const data = await res.json();
+        const currentMap = data.sent_bills || {};
+
+        if (previousBillsMap && showToast) {
+          const diff = computeBillsDiff(previousBillsMap, currentMap);
+          if (diff.hasChanges) {
+            showUpdateToast(diff);
+          }
+        }
+
+        previousBillsMap = currentMap;
+        cachedBills = Object.entries(currentMap).reverse();
+
+        updateDashboardStats();
+        renderFilteredBills();
+        return currentMap;
+      } catch (err) {
+        console.error('Error loading bills:', err);
+      }
+    }
+
+    async function sendManualBill(e) {
+      e.preventDefault();
+      const tracking = document.getElementById('manual-tracking').value.trim();
+      const phone = document.getElementById('manual-phone').value.trim();
+      const name = document.getElementById('manual-name').value.trim();
+      const btn = document.getElementById('btn-submit-send');
+      const feedback = document.getElementById('manual-feedback');
+
+      btn.disabled = true;
+      btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> ກຳລັງສົ່ງ...`;
+      feedback.className = 'mt-3 text-xs hidden p-3 rounded-xl';
+
+      try {
+        const res = await fetch('/api/send-bill', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ tracking, phone, name })
+        });
+        const data = await res.json();
+
+        if (data.success) {
+          feedback.className = 'mt-3 text-xs block p-3 rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-200';
+          feedback.innerHTML = `✅ <strong>ສຳເລັດ:</strong> ສົ່ງໃບບິນເລກ ${tracking} ຫາ WhatsApp ເບີ ${phone} ຮຽບຮ້ອຍແລ້ວ!`;
+          document.getElementById('manual-tracking').value = '';
+          document.getElementById('manual-phone').value = '';
+          document.getElementById('manual-name').value = '';
+          loadBills(true);
+        } else {
+          feedback.className = 'mt-3 text-xs block p-3 rounded-xl bg-red-50 text-red-800 border border-red-200';
+          feedback.innerHTML = `❌ <strong>ຜິດພາດ:</strong> ${data.error || 'ບໍ່ສາມາດສົ່ງໃບບິນໄດ້'}`;
+        }
+      } catch (err) {
+        feedback.className = 'mt-3 text-xs block p-3 rounded-xl bg-red-50 text-red-800 border border-red-200';
+        feedback.innerHTML = `❌ <strong>ຜິດພາດ:</strong> ${err.message}`;
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = `<i class="fas fa-paper-plane"></i> ສົ່ງໃບບິນເຂົ້າ WhatsApp`;
+      }
+    }
+
+    async function triggerSync() {
+      openSyncModal();
+
+      const btn = document.getElementById('btn-sync-now');
+      const icon = document.getElementById('sync-icon');
+      if (btn) btn.disabled = true;
+      if (icon) icon.className = 'fas fa-spinner fa-spin text-xs';
+
+      const oldMap = previousBillsMap || {};
+
+      try {
+        const res = await fetch('/api/sync-now', { method: 'POST' });
+        const data = await res.json();
+
+        const newMap = await loadBills(false);
+        const diff = computeBillsDiff(oldMap, newMap);
+
+        showSyncResultModal(data, diff);
+        if (diff.hasChanges) {
+          showUpdateToast(diff);
+        }
+      } catch (err) {
+        document.getElementById('sync-loading-body').classList.add('hidden');
+        document.getElementById('sync-result-body').classList.remove('hidden');
+        document.getElementById('sync-modal-title').textContent = '⚠️ ເກີດຂໍ້ຜິດພາດໃນການ Sync';
+        document.getElementById('sync-result-headline').textContent = 'ບໍ່ສາມາດເຊື່ອມຕໍ່ລະບົບ Sync ໄດ້';
+        document.getElementById('sync-result-desc').textContent = err.message || 'ກະລຸນາກວດສອບການເຊື່ອມຕໍ່ອິນເຕີເນັດ';
+      } finally {
+        if (btn) btn.disabled = false;
+        if (icon) icon.className = 'fas fa-sync-alt text-xs';
+      }
+    }
+
+    function openImportModal() {
+      document.getElementById('import-modal').classList.remove('hidden');
+      document.getElementById('import-tracking-input').focus();
+    }
+
+    function closeImportModal() {
+      document.getElementById('import-modal').classList.add('hidden');
+    }
+
+    async function submitBatchImport() {
+      const raw = document.getElementById('import-tracking-input').value.trim();
+      if (!raw) return alert('ກະລຸນາວາງເລກບິນກ່ອນ');
+
+      const trackingNumbers = raw.split(/[\n,;\s]+/).map(s => s.trim()).filter(Boolean);
+      if (trackingNumbers.length === 0) return alert('ບໍ່ພົບເລກບິນ');
+
+      const btn = document.getElementById('btn-submit-import');
+      btn.disabled = true;
+      btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> ກຳລັງດຶງຂໍ້ມູນ ${trackingNumbers.length} ລາຍການ...`;
+
+      try {
+        const res = await fetch('/api/batch-fetch', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ trackingNumbers })
+        });
+        const data = await res.json();
+
+        if (data.success) {
+          alert(`✅ ດຶງຂໍ້ມູນໃບບິນສຳເລັດແລ້ວ ${data.total} ລາຍການ!`);
+          closeImportModal();
+          document.getElementById('import-tracking-input').value = '';
+          loadBills();
+        } else {
+          alert('ເກີດຂໍ້ຜິດພາດ: ' + (data.error || 'ດຶງຂໍ້ມູນບໍ່ສຳເລັດ'));
+        }
+      } catch (err) {
+        alert('ເກີດຂໍ້ຜິດພາດ: ' + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = `<i class="fas fa-download"></i> ດຶງຂໍ້ມູນທັນທີ`;
+      }
+    }
+
+    function switchImportTab(tab) {
+      const fileForm = document.getElementById('csv-upload-form');
+      const pasteForm = document.getElementById('paste-upload-form');
+      const btnFile = document.getElementById('tab-btn-file');
+      const btnPaste = document.getElementById('tab-btn-paste');
+
+      if (tab === 'file') {
+        fileForm.classList.remove('hidden');
+        pasteForm.classList.add('hidden');
+        btnFile.className = 'text-xs px-2.5 py-1 rounded-lg font-semibold bg-white text-slate-900 shadow-sm transition';
+        btnPaste.className = 'text-xs px-2.5 py-1 rounded-lg font-medium text-slate-600 hover:text-slate-900 transition';
+      } else {
+        fileForm.classList.add('hidden');
+        pasteForm.classList.remove('hidden');
+        btnPaste.className = 'text-xs px-2.5 py-1 rounded-lg font-semibold bg-white text-slate-900 shadow-sm transition';
+        btnFile.className = 'text-xs px-2.5 py-1 rounded-lg font-medium text-slate-600 hover:text-slate-900 transition';
+        document.getElementById('paste-raw-input').focus();
+      }
+    }
+
+    async function uploadPastedData(e) {
+      e.preventDefault();
+      const rawText = document.getElementById('paste-raw-input').value.trim();
+      const feedback = document.getElementById('csv-feedback');
+      const btn = document.getElementById('btn-submit-paste');
+
+      if (!rawText) {
+        feedback.className = 'mt-3 text-xs block p-3 rounded-xl bg-amber-50 text-amber-800 border border-amber-200';
+        feedback.innerHTML = '⚠️ ກະລຸນາວາງຂໍ້ມູນຕາຕະລາງຈາກ Excel ກ່ອນ';
+        return;
+      }
+
+      btn.disabled = true;
+      btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> ກຳລັງອ່ານຂໍ້ມູນ...`;
+      feedback.className = 'mt-3 text-xs hidden p-3 rounded-xl';
+
+      try {
+        const res = await fetch('/api/paste-data', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ rawText })
+        });
+        const data = await res.json();
+
+        if (data.success) {
+          feedback.className = 'mt-3 text-xs block p-3 rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-200';
+          feedback.innerHTML = `✅ <strong>ສຳເລັດ:</strong> ນຳເຂົ້າຂໍ້ມູນໃບບິນແລ້ວ <strong>${data.total}</strong> ລາຍການ! ກົດປຸ່ມ <em>"ສົ່ງ WhatsApp ທັງໝົດ"</em> ເພື່ອເລີ່ມສົ່ງ.`;
+          document.getElementById('paste-raw-input').value = '';
+          loadBills();
+        } else {
+          feedback.className = 'mt-3 text-xs block p-3 rounded-xl bg-red-50 text-red-800 border border-red-200';
+          feedback.innerHTML = `❌ <strong>ຜິດພາດ:</strong> ${data.error || 'ນຳເຂົ້າຂໍ້ມູນບໍ່ສຳເລັດ'}`;
+        }
+      } catch (err) {
+        feedback.className = 'mt-3 text-xs block p-3 rounded-xl bg-red-50 text-red-800 border border-red-200';
+        feedback.innerHTML = `❌ <strong>ຜິດພາດ:</strong> ${err.message}`;
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = `<i class="fas fa-check-circle"></i> ອ່ານ & ນຳເຂົ້າຂໍ້ມູນທີ່ວາງ`;
+      }
+    }
+
+    // Drag and Drop support
+    const dropZone = document.getElementById('drop-zone');
+    if (dropZone) {
+      ['dragenter', 'dragover'].forEach(eventName => {
+        dropZone.addEventListener(eventName, (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          dropZone.classList.add('border-red-500', 'bg-red-50/50');
+        });
+      });
+      ['dragleave', 'drop'].forEach(eventName => {
+        dropZone.addEventListener(eventName, (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          dropZone.classList.remove('border-red-500', 'bg-red-50/50');
+        });
+      });
+      dropZone.addEventListener('drop', (e) => {
+        const dt = e.dataTransfer;
+        const files = dt.files;
+        if (files && files.length > 0) {
+          const fileInput = document.getElementById('csv-file-input');
+          fileInput.files = files;
+          handleFileSelected({ target: { files: files } });
+        }
+      });
+    }
+
+    function handleFileSelected(e) {
+      const file = e.target.files[0];
+      const textElem = document.getElementById('file-chosen-text');
+      if (file) {
+        textElem.innerHTML = `📄 ໄຟລ໌ທີ່ເລືອກ: <strong class="text-slate-900">${file.name}</strong> (${(file.size / 1024).toFixed(1)} KB)`;
+      } else {
+        textElem.textContent = 'ກົດທີ່ນີ້ເພື່ອເລືອກໄຟລ໌ Excel / CSV ຫຼື ລາກໄຟລ໌ມາວາງໃສ່ນີ້';
+      }
+    }
+
+
+
+    async function checkAutoReminderStatus() {
+      try {
+        const res = await fetch('/api/auto-reminder-status');
+        const data = await res.json();
+        const badge = document.getElementById('auto-reminder-badge');
+        if (badge) {
+          if (data.enabled) {
+            badge.className = 'cursor-pointer text-[10px] bg-amber-50 text-amber-800 font-semibold px-2 py-0.5 rounded-lg border border-amber-200 hover:bg-amber-100 transition';
+            badge.innerHTML = `⏰ ເຕືອນທຸກ 2 ວັນ: <strong>ເປີດ</strong> (7 ວັນກ່ອນຕີກັບ)`;
+          } else {
+            badge.className = 'cursor-pointer text-[10px] bg-slate-100 text-slate-500 font-medium px-2 py-0.5 rounded-lg border border-slate-200 hover:bg-slate-200 transition';
+            badge.innerHTML = `⏰ ເຕືອນທຸກ 2 ວັນ: <strong>ປິດ</strong>`;
+          }
+        }
+      } catch (err) {}
+    }
+
+    async function toggleAutoReminder() {
+      try {
+        const res = await fetch('/api/toggle-auto-reminder', { method: 'POST' });
+        const data = await res.json();
+        alert(data.message);
+        checkAutoReminderStatus();
+      } catch (err) {
+        alert('ຜິດພາດ: ' + err.message);
+      }
+    }
+
+    // Initial load and polling every 3 seconds for QR code / status
+    switchViewMode(currentViewMode);
+    checkStatus();
+    loadBills(false);
+    checkAutoReminderStatus();
+    setInterval(checkStatus, 3000);
+    setInterval(() => loadBills(true), 5000);
+  </script>
+</body>
+</html>

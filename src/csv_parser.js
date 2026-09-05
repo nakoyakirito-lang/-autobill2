@@ -8,7 +8,20 @@ function excelDateToDateStr(val) {
     const utc_days = Math.floor(val - 25569);
     const utc_value = utc_days * 86400;
     const date = new Date(utc_value * 1000);
-    return !isNaN(date.getTime()) ? date.toISOString().split('T')[0] : String(val);
+    if (!isNaN(date.getTime())) {
+      const y = date.getUTCFullYear();
+      let m = date.getUTCMonth() + 1;
+      let d = date.getUTCDate();
+      
+      // Fix Anousith Excel bug where DD-09-2026 or DD-08-2026 was parsed by Excel with swapped MM/DD
+      if ((d === 8 || d === 9) && m <= 12) {
+        const realDay = m;
+        const realMonth = d;
+        return `${y}-${String(realMonth).padStart(2, '0')}-${String(realDay).padStart(2, '0')}`;
+      }
+      return `${y}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+    }
+    return String(val);
   }
   const s = String(val).trim();
   // Match DD/MM/YYYY or DD-MM-YYYY (with optional HH:mm:ss)

@@ -36,14 +36,39 @@ function parseCodNumber(val) {
   return parseFloat(numStr) || 0;
 }
 
-function cleanStatus(rawStatus) {
-  if (!rawStatus) return 'ກຳລັງຂົນສົ່ງ';
-  const s = rawStatus.toString();
-  if (s.includes('ຕີກັບ') || s.includes('ສົ່ງຄືນ') || s.toLowerCase().includes('return')) return 'ຕີກັບ';
-  if (s.includes('ຮອດປາຍທາງ') || s.includes('ເຄື່ອງຮອດສາຂາ') || s.includes('ຮອດສາຂາ') || s.toLowerCase().includes('destination')) return 'ຮອດປາຍທາງ';
-  if (s.includes('ສຳເລັດ') || s.includes('ຈັດສົ່ງສຳເລັດ') || s.includes('ຮັບເຄື່ອງແລ້ວ') || s.includes('ເຊັນຮັບ') || s.toLowerCase().includes('delivered') || s.toLowerCase().includes('success')) return 'ສຳເລັດ (ຮັບເຄື່ອງແລ້ວ)';
-  if (s.includes('ກຳລັງຂົນສົ່ງ') || s.includes('ກຳລັງຈັດສົ່ງ') || s.includes('ກຳລັງດຳເນີນການ') || s.includes('ກຳລັງສົ່ງ') || s.toLowerCase().includes('transit') || s.toLowerCase().includes('shipping')) return 'ກຳລັງຂົນສົ່ງ';
-  return s.split('\n').pop().trim() || 'ກຳລັງຂົນສົ່ງ';
+function cleanStatus(rawStatus, allRowValues = '') {
+  const raw = String(rawStatus || '').trim().toLowerCase();
+  
+  // 1. If explicit rawStatus column is present, evaluate it first
+  if (raw) {
+    if (raw.includes('ຕີກັບ') || raw.includes('ຈັດສົ່ງຄືນ') || raw.includes('ສົ່ງຄືນ') || raw.includes('return') || raw.includes('reject')) {
+      return 'ຕີກັບ';
+    }
+    if (raw.includes('ຮອດປາຍທາງ') || raw.includes('ເຄື່ອງຮອດສາຂາ') || raw.includes('ຮອດສາຂາ') || raw.includes('ມາຮອດສາຂາ') || raw.includes('destination') || raw.includes('arrived')) {
+      return 'ຮອດປາຍທາງ';
+    }
+    if (raw.includes('ສຳເລັດ') || raw.includes('ຈັດສົ່ງສຳເລັດ') || raw.includes('ສົ່ງສຳເລັດ') || raw.includes('ຮັບເຄື່ອງແລ້ວ') || raw.includes('ເຊັນຮັບ') || raw.includes('delivered') || raw.includes('success')) {
+      if (raw.includes('ຍັງບໍທັນສະຫຼຸບ') || raw.includes('ຍັງບໍ່ທັນສະຫຼຸບ') || raw.includes('ຍັງບໍ່ສະຫຼຸບ') || raw.includes('ຍັງບໍສະຫຼຸບ')) {
+        return 'ຮັບແລ້ວ (ຍັງບໍ່ທັນສະຫຼຸບ)';
+      }
+      return 'ສະຫຼຸບແລ້ວ (ພ້ອມໂອນ)';
+    }
+    if (raw.includes('ກຳລັງ') || raw.includes('ຂົນສົ່ງ') || raw.includes('ຈັດສົ່ງ') || raw.includes('transit') || raw.includes('shipping')) {
+      return 'ກຳລັງຂົນສົ່ງ';
+    }
+  }
+
+  // 2. Fallback to allRowValues if rawStatus was ambiguous or not found
+  const combined = String(allRowValues || '').toLowerCase();
+  if (combined.includes('ຕີກັບ') || combined.includes('ຈັດສົ່ງຄືນຜູ້ຝາກ') || combined.includes('ສົ່ງຄືນຜູ້ຝາກ')) return 'ຕີກັບ';
+  if (combined.includes('ເຄື່ອງຮອດສາຂາປາຍທາງ') || combined.includes('ຮອດສາຂາປາຍທາງ') || combined.includes('ມາຮອດສາຂາ')) return 'ຮອດປາຍທາງ';
+  if (combined.includes('ຈັດສົ່ງສຳເລັດ') || combined.includes('ສົ່ງສຳເລັດ') || combined.includes('ຮັບເຄື່ອງແລ້ວ')) {
+    if (combined.includes('ຍັງບໍທັນສະຫຼຸບ') || combined.includes('ຍັງບໍ່ທັນສະຫຼຸບ')) return 'ຮັບແລ້ວ (ຍັງບໍ່ທັນສະຫຼຸບ)';
+    return 'ສະຫຼຸບແລ້ວ (ພ້ອມໂອນ)';
+  }
+  if (combined.includes('ກຳລັງຂົນສົ່ງ') || combined.includes('ກຳລັງຈັດສົ່ງ')) return 'ກຳລັງຂົນສົ່ງ';
+
+  return String(rawStatus || '').split('\n').pop().trim() || 'ກຳລັງຂົນສົ່ງ';
 }
 
 function isHalTracking(tracking) {
@@ -114,7 +139,8 @@ function parseUniversalLogisticsFile(filePathOrBufferOrText, defaultCarrier = nu
 
       // Tracking headers (Handle HAL "ເລກທີບິນ" vs Anousith "ເລກບິນ")
       if (k === 'ເລກທີບິນ' || k === 'ເລກບິນ' || k === 'ເລກພັດສະດຸ' || kLow === 'waybill' || kLow === 'tracking' || kLow === 'tracking_number' || kLow === 'bill_no' || kLow === 'id_list') {
-        tracking = v;
+        const trMatch = v.match(/\b(HAL\w+|HA\w+|8262\d+|87\d+|\d{7,15})\b/i);
+        tracking = trMatch ? trMatch[1] : v.split(/[\n\r]+/)[0].trim();
       }
       // Recipient phone
       else if (k === 'ເບີຜູ້ຮັບ' || k === 'ເບີໂທຜູ້ຮັບ' || kLow === 'receiver_phone' || kLow === 'recipient_phone') {
@@ -181,15 +207,20 @@ function parseUniversalLogisticsFile(filePathOrBufferOrText, defaultCarrier = nu
     const finalCarrier = rowCarrier || (isHalTracking(tracking) ? 'HAL Express' : 'Anousith Express');
 
     const billUrl = finalCarrier === 'HAL Express'
-      ? `https://halexpress.la/track?tracking=${encodeURIComponent(tracking)}`
+      ? `https://halexpress.la/parcel?tracking=${encodeURIComponent(tracking)}`
       : `https://app.anousith.express/landing/search_tracking/bill_share?tacking_number=${tracking}`;
 
-    const normalizedStatus = cleanStatus(rawStatus);
+    const allRowValues = Object.values(row).join(' ');
+    const normalizedStatus = cleanStatus(rawStatus, allRowValues);
+    const hasUnsettledKeyword = allRowValues.includes('ຍັງບໍທັນສະຫຼຸບ') || allRowValues.includes('ຍັງບໍ່ທັນສະຫຼຸບ') || allRowValues.includes('ຍັງບໍ່ສະຫຼຸບ') || allRowValues.includes('ຍັງບໍສະຫຼຸບ');
+    const settlementStatus = hasUnsettledKeyword
+      ? 'ຍັງບໍ່ທັນສະຫຼຸບ'
+      : (normalizedStatus.includes('ສະຫຼຸບແລ້ວ') || normalizedStatus.includes('ຮັບແລ້ວ') || normalizedStatus.includes('ສຳເລັດ') ? 'ສະຫຼຸບແລ້ວ (ພ້ອມໂອນ)' : '-');
     const numExpected = parseCodNumber(codExpected);
     let numCollected = parseCodNumber(codCollected);
 
-    // If parcel is delivered and collected wasn't specified, collected = expected
-    if (!numCollected && normalizedStatus.includes('ສຳເລັດ') && numExpected > 0) {
+    // If parcel is delivered/settled and collected wasn't specified, collected = expected
+    if (!numCollected && (normalizedStatus.includes('ສະຫຼຸບແລ້ວ') || normalizedStatus.includes('ສຳເລັດ') || normalizedStatus.includes('ຮັບເຄື່ອງ')) && numExpected > 0) {
       numCollected = numExpected;
     }
 
@@ -207,6 +238,7 @@ function parseUniversalLogisticsFile(filePathOrBufferOrText, defaultCarrier = nu
         codExpectedNum: numExpected,
         codCollectedNum: numCollected,
         shippingStatus: normalizedStatus,
+        settlementStatus: settlementStatus,
         rawStatus: rawStatus,
         originBranch: originBranch,
         destinationBranch: destinationBranch,

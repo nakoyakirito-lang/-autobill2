@@ -5,6 +5,7 @@ temp_bills/
 data/
 uploads/
 scratch/
+auto_import/
 *.log
 *.xlsx
 *.xls

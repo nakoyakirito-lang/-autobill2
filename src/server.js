@@ -29,6 +29,7 @@ const fs = require('fs');
 const multer = require('multer');
 const upload = multer({ dest: path.join(__dirname, '..', 'uploads/') });
 const { parseAnousithFile } = require('./csv_parser');
+const folderWatcher = require('./folder_watcher');
 const WhatsAppBot = require('./whatsapp');
 const AnousithService = require('./anousith');
 const HalService = require('./hal');
@@ -72,24 +73,34 @@ const bot = new WhatsAppBot();
 const anousith = new AnousithService();
 const hal = new HalService();
 
+function isHalCarrier(item, tracking = '') {
+  const t = String(tracking || '').toUpperCase();
+  const c = String(item?.carrier || '').toUpperCase();
+  const u = String(item?.billUrl || '').toUpperCase();
+  return c.includes('HAL') || t.startsWith('HAL') || t.startsWith('VTE') || u.includes('HALEXPRESS') || u.includes('HAL-LOGISTICS');
+}
+
 function getCarrierName(item, tracking = '') {
   if (item?.carrier) return item.carrier;
-  if (String(tracking).toUpperCase().startsWith('HAL')) return 'HAL Express';
+  if (isHalCarrier(item, tracking)) return 'HAL Express';
   return 'Anousith Express';
 }
 
 function getCarrierTrackingUrl(item, tracking = '') {
+  if (isHalCarrier(item, tracking)) {
+    const cleanTrack = String(tracking || item?.tracking || '').trim();
+    return hal.getTrackingUrl(cleanTrack);
+  }
   if (item?.billUrl) return item.billUrl;
-  const isHal = (item?.carrier || '').includes('HAL') || String(tracking).toUpperCase().startsWith('HAL');
-  return isHal ? hal.getTrackingUrl(tracking) : anousith.getBillShareUrl(tracking);
+  return anousith.getBillShareUrl(tracking);
 }
 
 async function downloadCarrierSlipImage(item, tracking, savePath) {
-  const isHal = (item?.carrier || '').includes('HAL') || String(tracking).toUpperCase().startsWith('HAL');
-  if (isHal) {
-    return hal.downloadBillImage(tracking, savePath);
+  const cleanTrack = String(tracking || item?.tracking || '').trim();
+  if (isHalCarrier(item, cleanTrack)) {
+    return hal.downloadBillImage(cleanTrack, savePath, item);
   }
-  return anousith.downloadBillImage(tracking, savePath);
+  return anousith.downloadBillImage(item?.billUrl || cleanTrack, savePath);
 }
 
 async function sleep(ms) {
@@ -232,6 +243,32 @@ app.get('/api/bills', (req, res) => {
 });
 
 // REST API: Mark all bills as sent (reset unsent status to count from now on)
+
+// REST API: Update individual bill status
+app.post('/api/update-bill-status', (req, res) => {
+  const { tracking, status } = req.body;
+  if (!tracking || !status) {
+    return res.status(400).json({ error: 'ກະລຸນາລະບຸເລກບິນ ແລະ ສະຖານະໃໝ່' });
+  }
+
+  const db = getDatabase();
+  db.sent_bills = db.sent_bills || {};
+  if (!db.sent_bills[tracking]) {
+    return res.status(404).json({ error: 'ບໍ່ພົບເລກບິນນີ້ໃນລະບົບ' });
+  }
+
+  db.sent_bills[tracking].shippingStatus = status;
+  db.sent_bills[tracking].updated_at = new Date().toISOString();
+  saveDatabase(db);
+
+  res.json({
+    success: true,
+    tracking,
+    status,
+    message: `ອັບເດດສະຖານະເລກບິນ #${tracking} ເປັນ "${status}" ສຳເລັດ!`
+  });
+});
+
 app.post('/api/mark-all-sent', (req, res) => {
   const { carrier } = req.body || {};
   const result = markAllBillsAsSent(carrier);
@@ -453,6 +490,41 @@ app.post('/api/paste-data', async (req, res) => {
   }
 });
 
+// REST API: Auto-Import Folder Watcher Status & Config
+app.get('/api/auto-import/status', (req, res) => {
+  res.json({
+    success: true,
+    ...folderWatcher.getStatus()
+  });
+});
+
+app.post('/api/auto-import/toggle', (req, res) => {
+  const { enabled } = req.body;
+  const status = folderWatcher.toggle(enabled);
+  res.json({
+    success: true,
+    message: status.enabled ? 'ເປີດລະບົບດຶງຂໍ້ມູນອັດຕະໂນມັດແລ້ວ' : 'ປິດລະບົບດຶງຂໍ້ມູນອັດຕະໂນມັດແລ້ວ',
+    ...status
+  });
+});
+
+app.post('/api/auto-import/scan-now', async (req, res) => {
+  try {
+    const results = await folderWatcher.scanAllFolders();
+    res.json({
+      success: true,
+      count: results.length,
+      results,
+      status: folderWatcher.getStatus(),
+      message: results.length > 0 
+        ? `ກວດພົບ ແລະ ນຳເຂົ້າອັດຕະໂນມັດສຳເລັດ ${results.length} ໄຟລ໌!`
+        : `ກວດສອບແລ້ວ — ບໍ່ພົບໄຟລ໌ໃໝ່ທີ່ຍັງບໍ່ໄດ້ນຳເຂົ້າ`
+    });
+  } catch (err) {
+    res.status(500).json({ error: 'ເກີດຂໍ້ຜິດພາດ: ' + err.message });
+  }
+});
+
 // REST API: Stream Send All Pending Bills to WhatsApp with Real-time Progress & Validation
 app.get('/api/send-all-whatsapp-stream', async (req, res) => {
   res.setHeader('Content-Type', 'text/event-stream; charset=utf-8');
@@ -631,10 +703,13 @@ app.get('/api/send-all-arrival-reminders-stream', async (req, res) => {
     return res.end();
   }
 
-  const { force, carrier } = req.query;
+  const { force, carrier, remind_round, date, date_from, date_to } = req.query;
   const db = getDatabase();
   const list = Object.entries(db.sent_bills || {});
   const now = Date.now();
+
+  const targetDateFrom = date || date_from;
+  const targetDateTo = date || date_to;
 
   const atDestDueList = list.filter(([t, item]) => {
     const st = item.shippingStatus || '';
@@ -643,6 +718,19 @@ app.get('/api/send-all-arrival-reminders-stream', async (req, res) => {
     if (carrier && carrier !== 'all') {
       const itemCarrier = getCarrierName(item, t);
       if (!itemCarrier.toLowerCase().includes(carrier.toLowerCase())) return false;
+    }
+
+    if (targetDateFrom || targetDateTo) {
+      if (!checkBillMatchesDate(item, targetDateFrom, targetDateTo)) return false;
+    }
+
+    const rCount = item.reminder_count || (item.notified_arrival ? 1 : 0);
+    if (remind_round === '1') {
+      if (rCount !== 0) return false;
+    } else if (remind_round === '2') {
+      if (rCount !== 1) return false;
+    } else if (remind_round === '3') {
+      if (rCount < 2) return false;
     }
 
     if (force === 'true') return true;
@@ -1468,6 +1556,9 @@ async function startServer() {
 
   // Start 2-day reminder check (every 30 minutes)
   setInterval(checkAndSend2DayReminders, 30 * 60 * 1000);
+
+  // Start Auto-Import Folder Watcher (Downloads & auto_import folders)
+  folderWatcher.init();
 }
 
 startServer().catch(console.error);

@@ -2,17 +2,31 @@ require('dotenv').config();
 const puppeteer = require('puppeteer');
 const path = require('path');
 const fs = require('fs');
-const { isBillSent, markBillSent } = require('./db');
+const { getDatabase, saveDatabase, upsertBill, getActiveAccount } = require('./db');
 
-const TEMP_BILLS_DIR = path.join(__dirname, '..', 'temp_bills');
-if (!fs.existsSync(TEMP_BILLS_DIR)) {
-  fs.mkdirSync(TEMP_BILLS_DIR, { recursive: true });
+function normalizeAnousithStatus(rawStatus) {
+  if (!rawStatus) return 'ກຳລັງຂົນສົ່ງ';
+  const s = String(rawStatus).toLowerCase();
+
+  if (s.includes('ຮັບເຄື່ອງ') || s.includes('ສຳເລັດ') || s.includes('delivered') || s.includes('success') || s.includes('finish') || s.includes('close') || s.includes('ສະຫຼຸບ')) {
+    return 'ສະຫຼຸບແລ້ວ (ພ້ອມໂອນ)';
+  }
+  if (s.includes('ຕີກັບ') || s.includes('return') || s.includes('reject') || s.includes('cancel')) {
+    return 'ຕີກັບ';
+  }
+  if (s.includes('ຮອດປາຍທາງ') || s.includes('destination') || s.includes('arrived') || s.includes('reach') || s.includes('wait')) {
+    return 'ຮອດປາຍທາງ';
+  }
+  if (s.includes('ກຳລັງ') || s.includes('transit') || s.includes('shipping') || s.includes('process') || s.includes('send')) {
+    return 'ກຳລັງຂົນສົ່ງ';
+  }
+  return rawStatus;
 }
 
 class AnousithScraper {
   constructor() {
-    let rawPhone = process.env.ANOUSITH_USERNAME || '02028372583';
-    // Format to 8 digits if prefixed with 020 / 85620 / +85620
+    const activeAcc = getActiveAccount ? getActiveAccount() : null;
+    let rawPhone = activeAcc?.phone || process.env.ANOUSITH_USERNAME || '02028372583';
     this.phone = rawPhone.replace(/^(\+?85620|020|20)/, '');
     if (this.phone.length < 8) this.phone = '28372583';
     this.password = process.env.ANOUSITH_PASSWORD || 'Jo112233';
@@ -20,14 +34,14 @@ class AnousithScraper {
   }
 
   async syncAllBills() {
-    console.log(`\n🤖 Starting Anousith Web Sync for account: ${this.phone}...`);
+    console.log(`\n🤖 Starting Anousith Live Status Sync for account: ${this.phone}...`);
 
     const browser = await puppeteer.launch({
       headless: 'new',
       args: ['--no-sandbox', '--disable-setuid-sandbox']
     });
 
-    const collectedBills = [];
+    const collectedBills = new Map();
 
     try {
       const page = await browser.newPage();
@@ -50,7 +64,8 @@ class AnousithScraper {
                 text.includes('bill_no') ||
                 text.includes('itemSameDays') ||
                 text.includes('itemsV2') ||
-                text.includes('itemsFinalCustomers'))
+                text.includes('itemsFinalCustomers') ||
+                text.includes('status'))
             ) {
               try {
                 const json = JSON.parse(text);
@@ -63,20 +78,31 @@ class AnousithScraper {
                   const tracking = obj.tracking_number || obj.trackingId || obj.bill_no || obj.id_list;
                   const phone = obj.receiver_phone || obj.recipient_phone || obj.phone || obj.contact_info;
                   const name = obj.receiver_name || obj.recipient_name || obj.customer_name;
+                  const rawSt = obj.status_name || obj.status || obj.shipping_status || obj.item_status || obj.status_description || obj.delivery_status;
+                  const cod = obj.cod_amount || obj.cod || obj.cod_expected || obj.price || obj.total_price;
+                  const branch = obj.destination_branch_name || obj.branch_name || obj.to_branch || obj.destination;
+                  const dateDep = obj.created_at || obj.deposit_date || obj.date;
+
                   if (tracking && (typeof tracking === 'string' || typeof tracking === 'number')) {
-                    const trStr = tracking.toString();
-                    if (trStr.length >= 7 && !collectedBills.some((b) => b.tracking === trStr)) {
-                      collectedBills.push({
+                    const trStr = tracking.toString().trim();
+                    if (trStr.length >= 7) {
+                      const normalizedSt = rawSt ? normalizeAnousithStatus(rawSt) : null;
+                      const existing = collectedBills.get(trStr) || {};
+                      collectedBills.set(trStr, {
                         tracking: trStr,
-                        phone: phone || '',
-                        name: name || 'ລູກຄ້າ',
-                        raw: obj
+                        phone: phone || existing.phone || '',
+                        name: name || existing.name || 'ລູກຄ້າ',
+                        status: normalizedSt || existing.status || 'ກຳລັງຂົນສົ່ງ',
+                        rawStatus: rawSt || existing.rawStatus || '',
+                        cod: cod || existing.cod || 0,
+                        branch: branch || existing.branch || '-',
+                        date: dateDep || existing.date || ''
                       });
                     }
                   }
                   Object.values(obj).forEach(scanObj);
                 };
-                scanObj(json.data);
+                scanObj(json.data || json);
               } catch (e) {}
             }
           }
@@ -105,56 +131,53 @@ class AnousithScraper {
         console.log('✅ Logged in successfully! Dashboard URL:', page.url());
       }
 
-      // Visit sections
-      const clickTargets = ['ບິນຝາກພັດສະດຸ', 'ຈັດການພັດສະດຸ', 'ການເຄື່ອນໄຫວ', 'ສະຫຼຸບ COD'];
-      for (const target of clickTargets) {
+      // Directly visit management pages
+      const pagesToVisit = [
+        `${this.baseUrl}/nextday/manage-parcels`,
+        `${this.baseUrl}/nextday/bills`,
+        `${this.baseUrl}/nextday/cod`,
+        `${this.baseUrl}/nextday/home`
+      ];
+
+      for (const targetUrl of pagesToVisit) {
         try {
-          console.log(`📑 Loading section: ${target}...`);
-          await page.evaluate((t) => {
-            const els = Array.from(document.querySelectorAll('button, a, div, span, p'));
-            const match = els.find((el) => el.innerText && el.innerText.trim().includes(t));
-            if (match) match.click();
-          }, target);
-          await new Promise((r) => setTimeout(r, 3500));
-          await page.evaluate(() => window.scrollBy(0, 1000));
+          console.log(`📑 Loading page: ${targetUrl}...`);
+          await page.goto(targetUrl, { waitUntil: 'networkidle2', timeout: 15000 }).catch(() => {});
+          await new Promise((r) => setTimeout(r, 3000));
+          await page.evaluate(() => window.scrollBy(0, 1500));
           await new Promise((r) => setTimeout(r, 2000));
         } catch (e) {}
       }
 
-      // Check DOM trackings
-      const domTrackings = await page.evaluate(() => {
-        const text = document.body.innerText;
-        const matches = text.match(/\b87\d{11}\b|\b[0-9]{13}\b/g) || [];
-        return [...new Set(matches)];
-      });
+      console.log(`\n🎉 Live Sync extracted ${collectedBills.size} parcels from Anousith!`);
 
-      domTrackings.forEach((tr) => {
-        if (!collectedBills.some((b) => b.tracking === tr)) {
-          collectedBills.push({
-            tracking: tr,
-            phone: '',
-            name: 'ລູກຄ້າ',
-            fromDom: true
-          });
-        }
-      });
+      const db = getDatabase();
+      db.sent_bills = db.sent_bills || {};
 
-      console.log(`\n🎉 Extracted ${collectedBills.length} total bills from Savage Shop!`);
+      let updatedCount = 0;
+      let newCount = 0;
 
-      // Save to database
-      for (const bill of collectedBills) {
-        const tracking = bill.tracking;
+      for (const [tracking, bill] of collectedBills.entries()) {
+        const exists = Boolean(db.sent_bills[tracking]);
+        if (!exists) newCount++;
+        else updatedCount++;
+
         const billUrl = `https://app.anousith.express/landing/search_tracking/bill_share?tacking_number=${tracking}`;
-        markBillSent(tracking, {
-          recipientPhone: bill.phone || '-',
-          recipientName: bill.name || 'ລູກຄ້າ',
-          sentVia: 'Anousith Savage Shop Sync',
+        
+        upsertBill(tracking, {
+          recipientPhone: bill.phone || db.sent_bills[tracking]?.recipientPhone || '-',
+          recipientName: bill.name || db.sent_bills[tracking]?.recipientName || 'ລູກຄ້າ',
+          shippingStatus: bill.status || db.sent_bills[tracking]?.shippingStatus || 'ກຳລັງຂົນສົ່ງ',
+          rawStatus: bill.rawStatus || db.sent_bills[tracking]?.rawStatus || '',
+          destinationBranch: bill.branch || db.sent_bills[tracking]?.destinationBranch || '-',
+          carrier: 'Anousith Express',
+          sentVia: exists ? 'Live Status Sync Update' : 'Live Status Sync',
           billUrl: billUrl
         });
       }
 
       await browser.close();
-      return collectedBills;
+      return Array.from(collectedBills.values());
     } catch (err) {
       console.error('❌ Error in syncAllBills:', err.message);
       await browser.close().catch(() => {});

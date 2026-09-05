@@ -338,7 +338,7 @@
         <!-- Batch Action Buttons -->
         <div class="flex flex-wrap items-center gap-1.5 sm:gap-2">
           <button onclick="openSendDateModal()" id="btn-notify-all-wa" class="text-xs bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-3 py-1.5 rounded-xl shadow-sm transition flex items-center gap-1.5 hover:scale-[1.02] active:scale-95 cursor-pointer">
-            <i class="fab fa-whatsapp text-sm"></i> ສົ່ງ WhatsApp ຕາມວັນທີ (<span id="btn-cnt-unsent">0</span>)
+            <i class="fab fa-whatsapp text-sm"></i> ສົ່ງ WhatsApp ຕາມວັນທີຝາກ (<span id="btn-cnt-unsent">0</span>)
           </button>
           <button onclick="sendAllArrivalReminders()" id="btn-notify-all-dest" class="text-xs bg-amber-600 hover:bg-amber-700 text-white font-semibold px-2.5 py-1.5 rounded-lg shadow-sm transition flex items-center gap-1.5 hover:scale-[1.02] active:scale-95 cursor-pointer">
             <i class="fas fa-bell"></i> ເຕືອນປາຍທາງ (<span id="btn-cnt-dest">0</span>)
@@ -561,8 +561,8 @@
                 <i class="fab fa-whatsapp"></i>
               </div>
               <div>
-                <h3 class="font-bold text-slate-900 text-base">ເລືອກວັນທີເພື່ອສົ່ງໃບບິນ WhatsApp</h3>
-                <p class="text-xs text-slate-500">ເລືອກວັນທີທີ່ຕ້ອງການສົ່ງຫາລູກຄ້າໂດຍສະເພາະ</p>
+                <h3 class="font-bold text-slate-900 text-base">ເລືອກວັນທີຝາກ (Deposit Date) ເພື່ອສົ່ງໃບບິນ WhatsApp</h3>
+                <p class="text-xs text-slate-500">ເລືອກສົ່ງສະເພາະໃບບິນທີ່ລູກຄ້າມາຝາກເຄື່ອງໃນວັນທີນັ້ນໆ</p>
               </div>
             </div>
             <button onclick="closeSendDateModal()" class="text-slate-400 hover:text-slate-700 text-xl p-1 rounded-lg transition">&times;</button>
@@ -573,7 +573,7 @@
             <!-- 1. Date Selection Options -->
             <div class="space-y-2">
               <label class="text-xs font-bold text-slate-700 flex items-center gap-1.5">
-                <i class="far fa-calendar-alt text-emerald-600"></i> ເລືອກວັນທີຂອງໃບບິນ:
+                <i class="far fa-calendar-alt text-emerald-600"></i> ເລືອກວັນທີຝາກເຄື່ອງ (Deposit Date):
               </label>
               <div class="grid grid-cols-2 gap-2 text-xs">
                 <button type="button" onclick="selectSendDateMode('current')" id="btn-sd-current"
@@ -2484,6 +2484,7 @@
     function calculateSendModalCount() {
       const { dateFrom, dateTo, label } = getSelectedDateRangeForSend();
       let count = 0;
+      const matchedBills = [];
 
       cachedBills.forEach(([tracking, item]) => {
         // Only unsent bills that have phone numbers
@@ -2496,7 +2497,7 @@
           if (!carrier.toLowerCase().includes(sendModalCarrier.toLowerCase())) return;
         }
 
-        // Date filter
+        // Deposit Date filter
         if (dateFrom || dateTo) {
           const dStr = normalizeDateStr(item.dateDeposited, item.sent_at);
           if (dateFrom && dStr && dStr < dateFrom) return;
@@ -2504,6 +2505,7 @@
         }
 
         count++;
+        matchedBills.push({ tracking, item });
       });
 
       const countBadge = document.getElementById('sd-summary-count');
@@ -2514,17 +2516,17 @@
 
       if (countBadge) countBadge.textContent = `${count} ບິນ`;
       if (descBox) {
-        descBox.innerHTML = `ວັນທີ: <strong>${label}</strong> | ຂົນສົ່ງ: <strong>${carrierLabel}</strong>`;
+        descBox.innerHTML = `ວັນທີຝາກ: <strong>${label}</strong> | ຂົນສົ່ງ: <strong>${carrierLabel}</strong> (ພ້ອມສົ່ງ ${count} ລາຍການ)`;
       }
       if (submitBtn) {
         if (count === 0) {
           submitBtn.disabled = true;
           submitBtn.className = 'px-5 py-2 rounded-xl bg-slate-300 text-slate-500 text-xs font-bold cursor-not-allowed';
-          submitBtn.innerHTML = `<i class="fab fa-whatsapp text-sm"></i> ບໍ່ມີບິນທີ່ລໍຖ້າສົ່ງ`;
+          submitBtn.innerHTML = `<i class="fab fa-whatsapp text-sm"></i> ບໍ່ພົບໃບບິນວັນທີຝາກນີ້ທີ່ລໍຖ້າສົ່ງ`;
         } else {
           submitBtn.disabled = false;
           submitBtn.className = 'px-5 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white text-xs font-bold shadow-md transition flex items-center gap-1.5 hover:scale-105 active:scale-95 cursor-pointer';
-          submitBtn.innerHTML = `<i class="fab fa-whatsapp text-sm"></i> ເລີ່ມຕົ້ນສົ່ງ WhatsApp (${count} ບິນ)`;
+          submitBtn.innerHTML = `<i class="fab fa-whatsapp text-sm"></i> ເລີ່ມຕົ້ນສົ່ງ WhatsApp ວັນທີຝາກນີ້ (${count} ບິນ)`;
         }
       }
     }

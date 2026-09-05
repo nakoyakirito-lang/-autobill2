@@ -464,8 +464,9 @@ app.get('/api/send-all-whatsapp-stream', async (req, res) => {
     res.write(`data: ${JSON.stringify(data)}\n\n`);
   };
 
-  if (!bot.isConnected) {
-    sendSSE({ type: 'error', error: 'WhatsApp ຍັງບໍ່ທັນເຊື່ອມຕໍ່ ກະລຸນາສະແກນ QR Code ກ່ອນ' });
+  const isReady = await bot.waitForConnection(10000);
+  if (!isReady) {
+    sendSSE({ type: 'error', error: 'WhatsApp ຍັງບໍ່ທັນເຊື່ອມຕໍ່ ຫຼື ກຳລັງກຽມພ້ອມເຊື່ອມຕໍ່ໃໝ່ ກະລຸນາລໍຖ້າ 5-10 ວິນາທີ ຫຼື ສະແກນ QR Code ດ້ານເທິງ' });
     return res.end();
   }
 

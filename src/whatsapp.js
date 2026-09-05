@@ -87,6 +87,20 @@ class WhatsAppBot {
   /**
    * Send a text message to a WhatsApp JID (e.g. 85620XXXXXXXX@s.whatsapp.net)
    */
+  
+  /**
+   * Wait for active connection if currently reconnecting
+   */
+  async waitForConnection(timeoutMs = 15000) {
+    if (this.isConnected && this.sock) return true;
+    const startTime = Date.now();
+    while (Date.now() - startTime < timeoutMs) {
+      if (this.isConnected && this.sock) return true;
+      await new Promise(r => setTimeout(r, 500));
+    }
+    return this.isConnected && Boolean(this.sock);
+  }
+
   async sendMessage(jid, text) {
     if (!this.sock || !this.isConnected) {
       throw new Error('WhatsApp bot is not connected yet');

@@ -40,6 +40,25 @@ function isBillSent(trackingNumber) {
   return Boolean(db.sent_bills && db.sent_bills[trackingNumber]);
 }
 
+function upsertBill(trackingNumber, metadata = {}) {
+  if (!trackingNumber) return;
+  const db = getDatabase();
+  db.sent_bills = db.sent_bills || {};
+  const existing = db.sent_bills[trackingNumber] || {};
+
+  db.sent_bills[trackingNumber] = {
+    ...existing,
+    ...metadata,
+    sent_to_whatsapp: metadata.sent_to_whatsapp !== undefined 
+      ? metadata.sent_to_whatsapp 
+      : (existing.sent_to_whatsapp !== undefined ? existing.sent_to_whatsapp : false),
+    sent_at: existing.sent_at || metadata.sent_at || null,
+    updated_at: new Date().toISOString()
+  };
+  saveDatabase(db);
+  return db.sent_bills[trackingNumber];
+}
+
 function markBillSent(trackingNumber, metadata = {}) {
   if (!trackingNumber) return;
   const db = getDatabase();
@@ -281,6 +300,7 @@ function deleteHalAccount(phone) {
 }
 
 module.exports = {
+  upsertBill,
   isBillSent,
   markBillSent,
   markAllBillsAsSent,

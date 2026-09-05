@@ -35,7 +35,7 @@ const HalService = require('./hal');
 const { formatLaoPhoneToWhatsAppJid } = require('./formatter');
 const { 
   isBillSent, 
-  markBillSent, 
+  markBillSent, upsertBill, 
   markAllBillsAsSent,
   markAllRemindersAsSent,
   recordReminder, 
@@ -361,7 +361,7 @@ app.post('/api/upload-csv', upload.single('file'), async (req, res) => {
         updatedCount++;
       }
 
-      markBillSent(item.tracking, {
+      upsertBill(item.tracking, {
         recipientPhone: item.recipientPhone || '-',
         recipientName: item.recipientName || 'ລູກຄ້າ',
         itemName: item.itemName || '',
@@ -420,7 +420,7 @@ app.post('/api/paste-data', async (req, res) => {
         updatedCount++;
       }
 
-      markBillSent(item.tracking, {
+      upsertBill(item.tracking, {
         recipientPhone: item.recipientPhone || '-',
         recipientName: item.recipientName || 'ລູກຄ້າ',
         itemName: item.itemName || '',
@@ -469,14 +469,14 @@ app.get('/api/send-all-whatsapp-stream', async (req, res) => {
     return res.end();
   }
 
-  const { carrier, date_from, date_to, date } = req.query;
+  const { carrier, date_from, date_to, date, force } = req.query;
   const fromDate = date || date_from || '';
   const toDate = date || date_to || '';
 
   const db = getDatabase();
   const list = Object.entries(db.sent_bills || {});
   const pending = list.filter(([t, item]) => {
-    if (item.sent_to_whatsapp) return false;
+    if (item.sent_to_whatsapp && force !== 'true') return false;
     if (!item.recipientPhone || item.recipientPhone === '-') return false;
     if (carrier && carrier !== 'all') {
       const itemCarrier = getCarrierName(item, t);

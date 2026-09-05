@@ -337,8 +337,8 @@
 
         <!-- Batch Action Buttons -->
         <div class="flex flex-wrap items-center gap-1.5 sm:gap-2">
-          <button onclick="sendAllWhatsApp()" id="btn-notify-all-wa" class="text-xs bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-3 py-1.5 rounded-lg shadow-sm transition flex items-center gap-1.5 hover:scale-[1.02] active:scale-95 cursor-pointer">
-            <i class="fab fa-whatsapp text-sm"></i> ສົ່ງໃບບິນ (<span id="btn-cnt-unsent">0</span>)
+          <button onclick="openSendDateModal()" id="btn-notify-all-wa" class="text-xs bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-3 py-1.5 rounded-xl shadow-sm transition flex items-center gap-1.5 hover:scale-[1.02] active:scale-95 cursor-pointer">
+            <i class="fab fa-whatsapp text-sm"></i> ສົ່ງ WhatsApp ຕາມວັນທີ (<span id="btn-cnt-unsent">0</span>)
           </button>
           <button onclick="sendAllArrivalReminders()" id="btn-notify-all-dest" class="text-xs bg-amber-600 hover:bg-amber-700 text-white font-semibold px-2.5 py-1.5 rounded-lg shadow-sm transition flex items-center gap-1.5 hover:scale-[1.02] active:scale-95 cursor-pointer">
             <i class="fas fa-bell"></i> ເຕືອນປາຍທາງ (<span id="btn-cnt-dest">0</span>)
@@ -545,6 +545,120 @@
           <div class="flex justify-end pt-2 border-t">
             <button onclick="closeHistoryModal()" class="px-4 py-2 text-xs font-semibold text-slate-600 bg-slate-100 rounded-xl hover:bg-slate-200">
               ປິດ
+            </button>
+          </div>
+        </div>
+      </div>
+
+      
+      <!-- Send WhatsApp by Date Selection Modal -->
+      <div id="send-date-modal" class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-white rounded-3xl max-w-lg w-full p-6 space-y-4 shadow-2xl border border-slate-100 overflow-hidden flex flex-col max-h-[90vh]">
+          <!-- Modal Header -->
+          <div class="flex items-center justify-between border-b pb-3">
+            <div class="flex items-center gap-2.5">
+              <div class="w-10 h-10 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center text-lg font-bold shadow-xs">
+                <i class="fab fa-whatsapp"></i>
+              </div>
+              <div>
+                <h3 class="font-bold text-slate-900 text-base">ເລືອກວັນທີເພື່ອສົ່ງໃບບິນ WhatsApp</h3>
+                <p class="text-xs text-slate-500">ເລືອກວັນທີທີ່ຕ້ອງການສົ່ງຫາລູກຄ້າໂດຍສະເພາະ</p>
+              </div>
+            </div>
+            <button onclick="closeSendDateModal()" class="text-slate-400 hover:text-slate-700 text-xl p-1 rounded-lg transition">&times;</button>
+          </div>
+
+          <!-- Modal Body -->
+          <div class="space-y-4 overflow-y-auto pr-1">
+            <!-- 1. Date Selection Options -->
+            <div class="space-y-2">
+              <label class="text-xs font-bold text-slate-700 flex items-center gap-1.5">
+                <i class="far fa-calendar-alt text-emerald-600"></i> ເລືອກວັນທີຂອງໃບບິນ:
+              </label>
+              <div class="grid grid-cols-2 gap-2 text-xs">
+                <button type="button" onclick="selectSendDateMode('current')" id="btn-sd-current"
+                  class="p-2.5 rounded-xl border border-emerald-500 bg-emerald-50/70 text-emerald-900 font-bold flex flex-col items-start gap-1 transition text-left cursor-pointer">
+                  <span class="flex items-center gap-1"><i class="fas fa-filter text-emerald-600"></i> ຕາມວັນທີທີ່ເລືອກຢູ່</span>
+                  <span id="sd-current-label" class="text-[10px] text-emerald-700 font-normal">ທຸກວັນທີ</span>
+                </button>
+                <button type="button" onclick="selectSendDateMode('today')" id="btn-sd-today"
+                  class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 font-semibold flex flex-col items-start gap-1 transition text-left cursor-pointer">
+                  <span class="flex items-center gap-1"><i class="fas fa-calendar-day text-amber-500"></i> ບິນຂອງມື້ນີ້</span>
+                  <span id="sd-today-label" class="text-[10px] text-slate-400 font-mono">-</span>
+                </button>
+                <button type="button" onclick="selectSendDateMode('all')" id="btn-sd-all"
+                  class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 font-semibold flex flex-col items-start gap-1 transition text-left cursor-pointer">
+                  <span class="flex items-center gap-1"><i class="fas fa-layer-group text-blue-500"></i> ທຸກວັນທີ (ຍັງບໍ່ສົ່ງ)</span>
+                  <span class="text-[10px] text-slate-400 font-normal">ສົ່ງທຸກບິນທີ່ຄ້າງ</span>
+                </button>
+                <button type="button" onclick="selectSendDateMode('custom')" id="btn-sd-custom"
+                  class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 font-semibold flex flex-col items-start gap-1 transition text-left cursor-pointer">
+                  <span class="flex items-center gap-1"><i class="fas fa-calendar-plus text-purple-500"></i> ກຳນົດວັນທີເອງ</span>
+                  <span class="text-[10px] text-slate-400 font-normal">ເລືອກວັນທີສະເພາະ</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Custom Date Inputs (Shown when custom is selected) -->
+            <div id="sd-custom-inputs" class="hidden p-3 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
+              <div class="text-xs font-semibold text-slate-700">ກຳນົດຊ່ວງວັນທີ:</div>
+              <div class="grid grid-cols-2 gap-2 text-xs">
+                <div>
+                  <label class="text-[10px] text-slate-500 block mb-1">ແຕ່ວັນທີ:</label>
+                  <input type="date" id="sd-input-from" onchange="calculateSendModalCount()"
+                    class="w-full px-3 py-1.5 rounded-xl border border-slate-300 bg-white text-xs outline-none focus:ring-2 focus:ring-emerald-500 font-mono" />
+                </div>
+                <div>
+                  <label class="text-[10px] text-slate-500 block mb-1">ຫາວັນທີ:</label>
+                  <input type="date" id="sd-input-to" onchange="calculateSendModalCount()"
+                    class="w-full px-3 py-1.5 rounded-xl border border-slate-300 bg-white text-xs outline-none focus:ring-2 focus:ring-emerald-500 font-mono" />
+                </div>
+              </div>
+            </div>
+
+            <!-- 2. Carrier Selection -->
+            <div class="space-y-1.5">
+              <label class="text-xs font-bold text-slate-700 flex items-center gap-1.5">
+                <i class="fas fa-truck text-slate-500"></i> ເລືອກຂົນສົ່ງ:
+              </label>
+              <div class="flex items-center gap-2 text-xs">
+                <button type="button" onclick="selectSendCarrier('all')" id="btn-sc-all"
+                  class="flex-1 py-1.5 px-2 rounded-xl border border-slate-800 bg-slate-900 text-white font-bold transition text-center cursor-pointer">
+                  ທັງໝົດ
+                </button>
+                <button type="button" onclick="selectSendCarrier('Anousith Express')" id="btn-sc-anousith"
+                  class="flex-1 py-1.5 px-2 rounded-xl border border-slate-200 text-slate-700 font-semibold hover:bg-slate-50 transition text-center cursor-pointer">
+                  🔴 Anousith
+                </button>
+                <button type="button" onclick="selectSendCarrier('HAL Express')" id="btn-sc-hal"
+                  class="flex-1 py-1.5 px-2 rounded-xl border border-slate-200 text-slate-700 font-semibold hover:bg-slate-50 transition text-center cursor-pointer">
+                  ⚡ HAL
+                </button>
+              </div>
+            </div>
+
+            <!-- 3. Summary Box -->
+            <div class="p-3.5 rounded-2xl bg-emerald-50/90 border border-emerald-200/90 space-y-1 text-xs">
+              <div class="flex items-center justify-between">
+                <span class="text-emerald-900 font-semibold flex items-center gap-1">
+                  <i class="fas fa-check-circle text-emerald-600"></i> ພົບໃບບິນທີ່ລໍຖ້າສົ່ງ:
+                </span>
+                <span id="sd-summary-count" class="text-base font-bold text-emerald-900 font-mono bg-white px-2.5 py-0.5 rounded-lg border border-emerald-200 shadow-2xs">0 ບິນ</span>
+              </div>
+              <div id="sd-summary-desc" class="text-[11px] text-emerald-800">
+                ກຳລັງກຽມພ້ອມສົ່ງ...
+              </div>
+            </div>
+          </div>
+
+          <!-- Modal Footer -->
+          <div class="pt-3 border-t flex items-center justify-end gap-2">
+            <button type="button" onclick="closeSendDateModal()" class="px-4 py-2 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-50 text-xs font-semibold transition">
+              ຍົກເລີກ
+            </button>
+            <button type="button" onclick="confirmExecuteSendByDate()" id="btn-sd-submit"
+              class="px-5 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white text-xs font-bold shadow-md transition flex items-center gap-1.5 hover:scale-105 active:scale-95 cursor-pointer">
+              <i class="fab fa-whatsapp text-sm"></i> ເລີ່ມຕົ້ນສົ່ງ WhatsApp ທັນທີ
             </button>
           </div>
         </div>
@@ -2267,6 +2381,174 @@
         document.getElementById('progress-status-label').textContent = '⚠️ ການເຊື່ອມຕໍ່ສິ້ນສຸດລົງ';
         loadBills();
       };
+    }
+
+    
+    // Send WhatsApp by Date Selection State
+    let sendModalMode = 'current'; // 'current', 'today', 'all', 'custom'
+    let sendModalCarrier = 'all';
+
+    function openSendDateModal() {
+      sendModalCarrier = currentCarrierFilter || 'all';
+      const todayStr = new Date().toISOString().split('T')[0];
+      
+      const todayLabel = document.getElementById('sd-today-label');
+      if (todayLabel) todayLabel.textContent = todayStr;
+
+      const inputFrom = document.getElementById('sd-input-from');
+      const inputTo = document.getElementById('sd-input-to');
+      if (inputFrom) inputFrom.value = customDateFrom || todayStr;
+      if (inputTo) inputTo.value = customDateTo || todayStr;
+
+      // Current active filter label
+      const curLabel = document.getElementById('sd-current-label');
+      if (curLabel) {
+        if (!customDateFrom && !customDateTo) {
+          curLabel.textContent = 'ທຸກວັນທີ';
+        } else if (customDateFrom === customDateTo) {
+          curLabel.textContent = `ວັນທີ ${customDateFrom}`;
+        } else {
+          curLabel.textContent = `${customDateFrom} ຫາ ${customDateTo}`;
+        }
+      }
+
+      selectSendCarrier(sendModalCarrier);
+      selectSendDateMode(customDateFrom || customDateTo ? 'current' : 'all');
+
+      const modal = document.getElementById('send-date-modal');
+      if (modal) modal.classList.remove('hidden');
+    }
+
+    function closeSendDateModal() {
+      const modal = document.getElementById('send-date-modal');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    function selectSendCarrier(carrier) {
+      sendModalCarrier = carrier;
+      ['all', 'Anousith Express', 'HAL Express'].forEach(c => {
+        const id = c === 'all' ? 'btn-sc-all' : c === 'Anousith Express' ? 'btn-sc-anousith' : 'btn-sc-hal';
+        const btn = document.getElementById(id);
+        if (btn) {
+          if (c === carrier) {
+            btn.className = 'flex-1 py-1.5 px-2 rounded-xl border border-slate-800 bg-slate-900 text-white font-bold transition text-center cursor-pointer';
+          } else {
+            btn.className = 'flex-1 py-1.5 px-2 rounded-xl border border-slate-200 text-slate-700 font-semibold hover:bg-slate-50 transition text-center cursor-pointer';
+          }
+        }
+      });
+      calculateSendModalCount();
+    }
+
+    function selectSendDateMode(mode) {
+      sendModalMode = mode;
+      ['current', 'today', 'all', 'custom'].forEach(m => {
+        const btn = document.getElementById(`btn-sd-${m}`);
+        if (btn) {
+          if (m === mode) {
+            btn.className = 'p-2.5 rounded-xl border-2 border-emerald-500 bg-emerald-50/80 text-emerald-950 font-bold flex flex-col items-start gap-1 transition text-left cursor-pointer shadow-2xs';
+          } else {
+            btn.className = 'p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 font-semibold flex flex-col items-start gap-1 transition text-left cursor-pointer';
+          }
+        }
+      });
+
+      const customInputs = document.getElementById('sd-custom-inputs');
+      if (customInputs) {
+        if (mode === 'custom') {
+          customInputs.classList.remove('hidden');
+        } else {
+          customInputs.classList.add('hidden');
+        }
+      }
+
+      calculateSendModalCount();
+    }
+
+    function getSelectedDateRangeForSend() {
+      const todayStr = new Date().toISOString().split('T')[0];
+      if (sendModalMode === 'today') {
+        return { dateFrom: todayStr, dateTo: todayStr, label: `ມື້ນີ້ (${todayStr})` };
+      } else if (sendModalMode === 'all') {
+        return { dateFrom: '', dateTo: '', label: 'ທຸກວັນທີ' };
+      } else if (sendModalMode === 'custom') {
+        const f = document.getElementById('sd-input-from')?.value || '';
+        const t = document.getElementById('sd-input-to')?.value || '';
+        return { dateFrom: f, dateTo: t, label: f && t ? `${f} ຫາ ${t}` : f ? `ຕັ້ງແຕ່ ${f}` : t ? `ຮອດ ${t}` : 'ທຸກວັນທີ' };
+      } else {
+        // current filter
+        return { dateFrom: customDateFrom || '', dateTo: customDateTo || '', label: customDateFrom && customDateTo ? `${customDateFrom} ຫາ ${customDateTo}` : customDateFrom || customDateTo || 'ທຸກວັນທີ' };
+      }
+    }
+
+    function calculateSendModalCount() {
+      const { dateFrom, dateTo, label } = getSelectedDateRangeForSend();
+      let count = 0;
+
+      cachedBills.forEach(([tracking, item]) => {
+        // Only unsent bills that have phone numbers
+        if (item.sent_to_whatsapp) return;
+        if (!item.recipientPhone || item.recipientPhone === '-') return;
+
+        // Carrier filter
+        if (sendModalCarrier !== 'all') {
+          const carrier = item.carrier || (tracking.startsWith('HAL') || tracking.startsWith('HA') ? 'HAL Express' : 'Anousith Express');
+          if (!carrier.toLowerCase().includes(sendModalCarrier.toLowerCase())) return;
+        }
+
+        // Date filter
+        if (dateFrom || dateTo) {
+          const dStr = normalizeDateStr(item.dateDeposited, item.sent_at);
+          if (dateFrom && dStr && dStr < dateFrom) return;
+          if (dateTo && dStr && dStr > dateTo) return;
+        }
+
+        count++;
+      });
+
+      const countBadge = document.getElementById('sd-summary-count');
+      const descBox = document.getElementById('sd-summary-desc');
+      const submitBtn = document.getElementById('btn-sd-submit');
+
+      const carrierLabel = sendModalCarrier === 'all' ? 'ທຸກຂົນສົ່ງ' : sendModalCarrier;
+
+      if (countBadge) countBadge.textContent = `${count} ບິນ`;
+      if (descBox) {
+        descBox.innerHTML = `ວັນທີ: <strong>${label}</strong> | ຂົນສົ່ງ: <strong>${carrierLabel}</strong>`;
+      }
+      if (submitBtn) {
+        if (count === 0) {
+          submitBtn.disabled = true;
+          submitBtn.className = 'px-5 py-2 rounded-xl bg-slate-300 text-slate-500 text-xs font-bold cursor-not-allowed';
+          submitBtn.innerHTML = `<i class="fab fa-whatsapp text-sm"></i> ບໍ່ມີບິນທີ່ລໍຖ້າສົ່ງ`;
+        } else {
+          submitBtn.disabled = false;
+          submitBtn.className = 'px-5 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white text-xs font-bold shadow-md transition flex items-center gap-1.5 hover:scale-105 active:scale-95 cursor-pointer';
+          submitBtn.innerHTML = `<i class="fab fa-whatsapp text-sm"></i> ເລີ່ມຕົ້ນສົ່ງ WhatsApp (${count} ບິນ)`;
+        }
+      }
+    }
+
+    function confirmExecuteSendByDate() {
+      const { dateFrom, dateTo, label } = getSelectedDateRangeForSend();
+      closeSendDateModal();
+
+      let url = '/api/send-all-whatsapp-stream?';
+      const params = [];
+      if (sendModalCarrier && sendModalCarrier !== 'all') {
+        params.push(`carrier=${encodeURIComponent(sendModalCarrier)}`);
+      }
+      if (dateFrom) params.push(`date_from=${encodeURIComponent(dateFrom)}`);
+      if (dateTo) params.push(`date_to=${encodeURIComponent(dateTo)}`);
+      url += params.join('&');
+
+      const carrierLabel = sendModalCarrier === 'all' ? 'ທຸກຂົນສົ່ງ' : sendModalCarrier;
+
+      startStreamingTask(
+        url,
+        `📦 ກຳລັງສົ່ງໃບບິນ WhatsApp (${carrierLabel} - ${label})`,
+        'ລະບົບກຳລັງກວດສອບເບີ, ດາວໂຫຼດຮູບໃບບິນ ແລະ ສົ່ງຫາລູກຄ້າຕາມວັນທີທີ່ເລືອກ'
+      );
     }
 
     function sendAllWhatsApp() {

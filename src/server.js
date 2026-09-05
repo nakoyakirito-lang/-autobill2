@@ -1,3 +1,27 @@
+
+function normalizeDateStr(val, fallback) {
+  if (!val && fallback) return fallback.split('T')[0];
+  if (!val) return '';
+  const s = String(val).trim();
+  if (s.includes('T')) return s.split('T')[0];
+  if (s.match(/^d{4}-d{2}-d{2}$/)) return s;
+  const parts = s.split(/[\/\-\.]/);
+  if (parts.length === 3) {
+    if (parts[0].length === 4) return `${parts[0]}-${parts[1].padStart(2, '0')}-${parts[2].padStart(2, '0')}`;
+    if (parts[2].length === 4) return `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
+  }
+  return s;
+}
+
+function checkBillMatchesDate(item, dateFrom, dateTo) {
+  if (!dateFrom && !dateTo) return true;
+  const dStr = normalizeDateStr(item.dateDeposited, item.sent_at);
+  if (!dStr) return true;
+  if (dateFrom && dStr < dateFrom) return false;
+  if (dateTo && dStr > dateTo) return false;
+  return true;
+}
+
 require('dotenv').config();
 const express = require('express');
 const path = require('path');
@@ -445,7 +469,10 @@ app.get('/api/send-all-whatsapp-stream', async (req, res) => {
     return res.end();
   }
 
-  const { carrier } = req.query;
+  const { carrier, date_from, date_to, date } = req.query;
+  const fromDate = date || date_from || '';
+  const toDate = date || date_to || '';
+
   const db = getDatabase();
   const list = Object.entries(db.sent_bills || {});
   const pending = list.filter(([t, item]) => {
@@ -455,6 +482,7 @@ app.get('/api/send-all-whatsapp-stream', async (req, res) => {
       const itemCarrier = getCarrierName(item, t);
       if (!itemCarrier.toLowerCase().includes(carrier.toLowerCase())) return false;
     }
+    if (!checkBillMatchesDate(item, fromDate, toDate)) return false;
     return true;
   });
 
